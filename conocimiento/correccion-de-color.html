@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corrección de color — Jorge Malgesto</title>
+
+  <meta name="jm:axis" content="visual-tecnica">
+  <meta name="jm:tag" content="J">
+  <meta name="jm:date" content="2025">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* Atmósfera propia — visual, técnica, clínica */
+    :root {
+      --bg:        #0a0c0f;
+      --bg-card:   #111418;
+      --text:      #dce3ec;
+      --text-soft: #9aabb8;
+      --text-dim:  #55687a;
+      --accent:    #4a9eca;
+      --border:    #1e2830;
+      --mono:      'JetBrains Mono', monospace;
+      --serif:     'Fraunces', Georgia, serif;
+      --sans:      'DM Sans', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100dvh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+      transition: color 150ms ease-out;
+    }
+    .return-link:hover { color: var(--text-soft); }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 32px;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .top-bar__tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .article-header {
+      margin-bottom: 48px;
+    }
+
+    .article-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .article-title {
+      font-family: var(--serif);
+      font-size: clamp(32px, 7vw, 52px);
+      font-weight: 500;
+      font-style: normal;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .article-intro {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--text-soft);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+
+    /* Módulos */
+    .module-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .module {
+      border-top: 0.5px solid var(--border);
+      padding: 24px 0;
+    }
+
+    .module:last-child {
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .module__header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .module__num {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      min-width: 28px;
+    }
+
+    .module__title {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .module__body {
+      padding-left: 44px;
+    }
+
+    .module__desc {
+      font-size: 15px;
+      color: var(--text-soft);
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+
+    .module__topics {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .module__topics li {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .module__topics li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .module__highlight {
+      display: inline;
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .section-divider {
+      margin: 48px 0 40px;
+      border: none;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 0.5px solid var(--border);
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+    }
+
+    @media (min-width: 768px) {
+      .wrap { padding: 40px 48px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="top-bar">
+    <a href="../conocimiento/" class="return-link">← jorge-malgesto / conocimiento</a>
+    <span class="top-bar__tag">Visual y técnica · J</span>
+  </div>
+
+  <header class="article-header">
+    <p class="article-eyebrow">Corrección de color</p>
+    <h1 class="article-title">Una clase completa.</h1>
+    <p class="article-intro">
+      Todo lo que necesitás saber para controlar el color en post-producción:
+      desde los fundamentos del ojo humano hasta el pipeline técnico de una entrega profesional.
+      Once módulos. Sin atajos.
+    </p>
+  </header>
+
+  <hr class="section-divider">
+
+  <div class="module-list">
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">01</span>
+        <h2 class="module__title">El ojo y la cámara</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Por qué la cámara no ve como el ojo. Rango dinámico, temperatura de color,
+          metamerismo y por qué lo que ves en el monitor <em class="module__highlight">nunca es lo que grabaste</em>.
+        </p>
+        <ul class="module__topics">
+          <li>Rango dinámico humano vs. sensor</li>
+          <li>Color primario, complementario y la rueda de color</li>
+          <li>Temperatura de color y el eje naranja-azul</li>
+          <li>Metamerismo: mismo color, distinta fuente</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">02</span>
+        <h2 class="module__title">Espacios de color y codecs</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Rec.709, Rec.2020, DCI-P3, sRGB. Qué es un espacio de color,
+          qué significa que un codec sea 4:2:0 y por qué el 10-bit
+          <em class="module__highlight">cambia todo</em> cuando empezás a gradearlo.
+        </p>
+        <ul class="module__topics">
+          <li>Bit depth y banding</li>
+          <li>Chroma subsampling 4:4:4 / 4:2:2 / 4:2:0</li>
+          <li>LUT de transformación vs. LUT de look</li>
+          <li>Gamut, primaries y white point</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">03</span>
+        <h2 class="module__title">Log y curvas de transferencia</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          S-Log, Log-C, V-Log, C-Log. Todas hacen lo mismo de formas distintas.
+          Entender la gamma te libera de depender de los presets del fabricante.
+        </p>
+        <ul class="module__topics">
+          <li>Qué es una curva de transferencia (OETF / EOTF)</li>
+          <li>Por qué el log se ve "lavado" recto de cámara</li>
+          <li>IDT / ODT en el pipeline ACES</li>
+          <li>Cómo elegir el punto de exposición correcto en log</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">04</span>
+        <h2 class="module__title">Los scopes</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Waveform, vectorscópio, parade y histogram.
+          <em class="module__highlight">No grades con los ojos solos.</em>
+          Los scopes no mienten aunque el monitor sí pueda hacerlo.
+        </p>
+        <ul class="module__topics">
+          <li>Leer el waveform para exposición y contraste</li>
+          <li>El vectorscopio y la saturación legal</li>
+          <li>Parade RGB para balance de color</li>
+          <li>Calibración de monitor con sonda</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">05</span>
+        <h2 class="module__title">Balance primario</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Lift, gamma, gain. Las ruedas de color como herramienta quirúrgica.
+          Cómo establecer el negro, el blanco y el gris medio antes de
+          tocar cualquier otra cosa.
+        </p>
+        <ul class="module__topics">
+          <li>Orden de operaciones: por qué primero el balance</li>
+          <li>Neutralizar el cast sin destruir la intención</li>
+          <li>Log wheel vs. offset wheel vs. linear wheel</li>
+          <li>El método de los grises neutros</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">06</span>
+        <h2 class="module__title">Curvas y contraste</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          La curva custom como extensión de las ruedas. Cómo construir
+          un contraste que se siente <em class="module__highlight">orgánico</em> y no aplastado.
+        </p>
+        <ul class="module__topics">
+          <li>S-curve y su efecto en la percepción de contraste</li>
+          <li>Curvas por canal (R, G, B independientes)</li>
+          <li>Curva Hue vs. Sat / Hue vs. Hue / Lum vs. Sat</li>
+          <li>Cuando la curva mata el detalle en las sombras</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">07</span>
+        <h2 class="module__title">Calificación secundaria</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Power windows, qualifiers, máscaras. Aislar la piel sin afectar
+          el cielo. Aislar el cielo sin afectar la piel.
+          La corrección secundaria es donde el grade <em class="module__highlight">respira</em>.
+        </p>
+        <ul class="module__topics">
+          <li>HSL qualifier y sus limitaciones</li>
+          <li>Power window: forma, tracking, feather</li>
+          <li>Tracking de objetos en movimiento</li>
+          <li>Cómo evitar el "halo" en las máscaras</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">08</span>
+        <h2 class="module__title">Corrección de piel</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          El tono de piel es lo primero que el ojo humano detecta como "mal".
+          La línea de piel en el vectorscopio y por qué todos los tonos
+          de piel <em class="module__highlight">caen en el mismo eje</em>.
+        </p>
+        <ul class="module__topics">
+          <li>La skin line a las 10-11 en el vectorscopio</li>
+          <li>Cómo ajustar piel sin afectar el resto de la imagen</li>
+          <li>Diferencia entre corregir y embellecer</li>
+          <li>Tonos de piel oscuros: errores comunes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">09</span>
+        <h2 class="module__title">LUTs: uso correcto</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Una LUT no es un filtro de Instagram. Cómo usarlas como punto de partida,
+          cuándo NO usarlas, y por qué una LUT de conversión
+          no es lo mismo que una LUT <em class="module__highlight">de look</em>.
+        </p>
+        <ul class="module__topics">
+          <li>LUT 1D vs. LUT 3D</li>
+          <li>LUT de input (IDT) vs. LUT de output (ODT)</li>
+          <li>Cómo construir tu propia LUT de look</li>
+          <li>Exportar .cube desde DaVinci Resolve</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">10</span>
+        <h2 class="module__title">Pipeline de entrega</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Rec.709, HDR10, HLG, Dolby Vision. Qué le vas a entregar a quién
+          y en qué espacio. La diferencia entre <em class="module__highlight">render</em> y <em class="module__highlight">entrega</em>
+          puede arruinar semanas de trabajo.
+        </p>
+        <ul class="module__topics">
+          <li>Especificaciones de entrega por plataforma (YouTube, Netflix, broadcast)</li>
+          <li>HDR: qué es y qué no es</li>
+          <li>Loudness y color en la misma entrega</li>
+          <li>Proxies, masters y archivos de archivo</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">11</span>
+        <h2 class="module__title">El lenguaje del color</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Por qué las películas de superhéroes son naranja-azul.
+          Cómo el color construye emociones, períodos históricos, mundos.
+          La técnica al servicio de <em class="module__highlight">algo que decir</em>.
+        </p>
+        <ul class="module__topics">
+          <li>Contraste de temperatura como herramienta narrativa</li>
+          <li>Referencia de looks: cómo analizar un grade ajeno</li>
+          <li>La paleta de Kubrick, Wong Kar-wai, Fincher</li>
+          <li>Cuando el color sobra y cuando falta</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /module-list -->
+
+  <footer class="footer">
+    Jorge Malgesto · Visual y técnica · 2025
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hartke Recomendador — Jorge Malgesto</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/system.css">
+
+  <style>
+    .page {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: var(--sp-5);
+      padding-bottom: var(--sp-8);
+    }
+
+    /* ── Header ──────────────────────────────────────────── */
+    .tool-header {
+      padding: var(--sp-6) 0 var(--sp-5);
+    }
+    .tool-header__back { display: block; margin-bottom: var(--sp-5); }
+    .tool-header__brand {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-dim);
+      margin-bottom: var(--sp-1);
+    }
+    .tool-header__model {
+      font-family: var(--font-serif);
+      font-size: var(--fs-h2);
+      font-weight: 500;
+      color: var(--color-text);
+      line-height: 1.2;
+    }
+    .tool-header__spec {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--color-text-mute);
+      margin-top: var(--sp-1);
+    }
+
+    /* ── Sección genérica ─────────────────────────────────── */
+    .section {
+      margin-top: var(--sp-5);
+      padding-top: var(--sp-5);
+      border-top: var(--border-thin);
+    }
+    .section__label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-dim);
+      margin-bottom: var(--sp-3);
+    }
+
+    /* ── Selector de bajo ─────────────────────────────────── */
+    .bass-selector {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      background: var(--color-bg-card);
+      border: var(--border-thin);
+      border-radius: var(--radius-pill);
+      padding: var(--sp-2) var(--sp-4);
+      cursor: default;
+      user-select: none;
+    }
+    .bass-selector__name {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-soft);
+    }
+    .bass-selector__chevron {
+      color: var(--color-text-dim);
+      font-size: 10px;
+    }
+    .bass-selector__dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: var(--color-bg-card);
+      border: var(--border-thin);
+      border-radius: var(--radius-md);
+      padding: var(--sp-3);
+      z-index: 10;
+      display: none;
+      white-space: nowrap;
+    }
+    .bass-selector:hover .bass-selector__dropdown,
+    .bass-selector:focus-within .bass-selector__dropdown { display: block; }
+    .bass-selector__dropdown span {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono);
+      color: var(--color-text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Selector de proyecto (pills) ────────────────────── */
+    .project-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+    }
+    .project-pill {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: var(--radius-pill);
+      border: 0.5px solid var(--color-border);
+      background: transparent;
+      color: var(--color-text-mute);
+      cursor: pointer;
+      transition: all 200ms ease-out;
+      user-select: none;
+    }
+    .project-pill.active {
+      background: var(--color-accent-soft);
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+
+    /* ── Pre Amp — dos knobs ─────────────────────────────── */
+    .preamp-row {
+      display: flex;
+      gap: var(--sp-6);
+    }
+    .knob-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+    .knob-svg { display: block; }
+    .knob-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--color-text-dim);
+      text-align: center;
+    }
+    .knob-value {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono);
+      color: var(--color-text-soft);
+      text-align: center;
+    }
+
+    /* ── Fila compresión + EQ toggle ─────────────────────── */
+    .comp-eq-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-7);
+    }
+
+    /* Compresión slider */
+    .comp-group { flex: 1; }
+    .comp-track {
+      position: relative;
+      height: 4px;
+      background: var(--color-bg-soft);
+      border-radius: 2px;
+      margin: var(--sp-3) 0;
+    }
+    .comp-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--color-accent);
+      border-radius: 2px;
+      transition: width 350ms cubic-bezier(.4,0,.2,1);
+    }
+    .comp-tick-row {
+      display: flex;
+      justify-content: space-between;
+    }
+    .comp-tick {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      color: var(--color-text-faint);
+      text-align: center;
+    }
+    .comp-tick.active-tick { color: var(--color-text-soft); }
+    .comp-display {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--color-text-soft);
+      margin-bottom: var(--sp-2);
+    }
+
+    /* EQ IN/OUT toggle */
+    .eq-toggle-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+      flex-shrink: 0;
+    }
+    .eq-toggle {
+      width: 44px;
+      height: 72px;
+      border-radius: var(--radius-md);
+      border: var(--border-medium);
+      background: var(--color-bg-soft);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      cursor: default;
+    }
+    .eq-toggle__half {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-faint);
+      transition: background 300ms ease-out, color 300ms ease-out;
+    }
+    .eq-toggle__half--in.eq-active {
+      background: var(--color-text);
+      color: var(--color-bg);
+    }
+    .eq-toggle__half--out.eq-active {
+      background: var(--color-bg-soft);
+      color: var(--color-text-soft);
+    }
+
+    /* ── Graphic EQ — 10 faders ──────────────────────────── */
+    .geq-section {}
+    .geq-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      padding: var(--sp-3) 0;
+      overflow-x: auto;
+      /* Marcas laterales a la izquierda */
+      padding-left: 28px;
+      position: relative;
+    }
+
+    /* Escala vertical de dB a la izquierda */
+    .geq-scale {
+      position: absolute;
+      left: 0;
+      top: var(--sp-3);
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .geq-scale__mark {
+      font-family: var(--font-mono);
+      font-size: 7px;
+      color: var(--color-text-faint);
+      line-height: 1;
+      text-align: right;
+      width: 24px;
+    }
+
+    /* Línea de cero */
+    .geq-zero-line {
+      position: absolute;
+      left: 28px; right: 0;
+      top: 50%;
+      height: 0.5px;
+      background: var(--color-border-soft);
+      pointer-events: none;
+    }
+
+    .fader-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-1);
+      flex: 1;
+      min-width: 28px;
+    }
+    .fader-track {
+      position: relative;
+      width: 20px;
+      height: 150px;
+      background: var(--color-bg-soft);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .fader-fill-pos {
+      position: absolute;
+      left: 0; right: 0;
+      background: var(--color-accent);
+      bottom: 50%;
+      border-radius: 1px;
+      transition: height 350ms cubic-bezier(.4,0,.2,1);
+    }
+    .fader-fill-neg {
+      position: absolute;
+      left: 0; right: 0;
+      background: #D85A30;
+      top: 50%;
+      border-radius: 1px;
+      transition: height 350ms cubic-bezier(.4,0,.2,1);
+    }
+    .fader-thumb {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 9px;
+      background: var(--color-text);
+      border-radius: 2px;
+      transition: bottom 350ms cubic-bezier(.4,0,.2,1);
+    }
+    .fader-thumb::after {
+      content: '';
+      position: absolute;
+      left: 3px; right: 3px;
+      top: 50%; height: 0.5px;
+      background: var(--color-bg-soft);
+    }
+    .fader-freq {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      text-transform: uppercase;
+      color: var(--color-text-dim);
+      text-align: center;
+      line-height: 1.2;
+    }
+    .fader-val {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      text-align: center;
+      color: var(--color-text-soft);
+      min-height: 12px;
+      transition: color 300ms ease-out;
+    }
+    .fader-val.pos { color: var(--color-text-soft); }
+    .fader-val.neg { color: #D85A30; }
+    .fader-val.zero { color: var(--color-text-dim); }
+
+    /* ── Contour knobs ───────────────────────────────────── */
+    .contour-row {
+      display: flex;
+      gap: var(--sp-6);
+    }
+
+    /* ── Nota del preset ─────────────────────────────────── */
+    .preset-note {
+      background: var(--color-bg-card);
+      border: var(--border-thin);
+      border-left: 2px solid var(--color-accent);
+      border-radius: var(--radius-md);
+      padding: var(--sp-4) var(--sp-5);
+    }
+    .preset-note p {
+      font-family: var(--font-serif);
+      font-size: var(--fs-body);
+      font-style: italic;
+      color: var(--color-text-soft);
+      line-height: 1.65;
+    }
+
+    @media (min-width: 480px) {
+      .fader-track { height: 180px; }
+      .fader-col { min-width: 32px; }
+      .geq-container { gap: 6px; }
+    }
+
+    @media (min-width: 768px) {
+      .page { padding: var(--sp-7); }
+      .fader-track { height: 200px; }
+      .fader-col { min-width: 36px; }
+      .geq-container { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header class="tool-header">
+    <a href="../herramientas/" class="return-link tool-header__back">← Herramientas</a>
+    <p class="tool-header__brand">Hartke Systems</p>
+    <h1 class="tool-header__model">HA3500</h1>
+    <p class="tool-header__spec">350W · Danoblaster pasivo · 4 cuerdas</p>
+  </header>
+
+  <!-- Bajo -->
+  <section class="section">
+    <p class="section__label">Bajo</p>
+    <div class="bass-selector" tabindex="0" aria-label="Selector de bajo">
+      <span class="bass-selector__name">Danoblaster pasivo · 4 cdas.</span>
+      <span class="bass-selector__chevron">▼</span>
+      <div class="bass-selector__dropdown">
+        <span>Próximamente: agregar bajo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Proyecto -->
+  <section class="section">
+    <p class="section__label">Proyecto</p>
+    <div class="project-pills">
+      <button class="project-pill active" data-project="davis-don">Davis Don</button>
+      <button class="project-pill" data-project="leocadio">Leocadio</button>
+      <button class="project-pill" data-project="juana">Juana</button>
+    </div>
+  </section>
+
+  <!-- Pre Amp -->
+  <section class="section">
+    <p class="section__label">Pre Amp</p>
+    <div class="preamp-row">
+      <div class="knob-group">
+        <svg class="knob-svg" id="knob-tube" width="64" height="64" viewBox="0 0 64 64" aria-label="Tube"></svg>
+        <span class="knob-label">Tube</span>
+        <span class="knob-value" id="val-tube">7.0</span>
+      </div>
+      <div class="knob-group">
+        <svg class="knob-svg" id="knob-ss" width="64" height="64" viewBox="0 0 64 64" aria-label="Solid State"></svg>
+        <span class="knob-label">Solid State</span>
+        <span class="knob-value" id="val-ss">4.0</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compresión + EQ -->
+  <section class="section">
+    <div class="comp-eq-row">
+      <div class="comp-group">
+        <p class="section__label">Compresión</p>
+        <p class="comp-display" id="comp-display">5</p>
+        <div class="comp-track">
+          <div class="comp-fill" id="comp-fill"></div>
+        </div>
+        <div class="comp-tick-row">
+          <span class="comp-tick">OFF</span>
+          <span class="comp-tick">3</span>
+          <span class="comp-tick">6</span>
+          <span class="comp-tick">9</span>
+          <span class="comp-tick">∞</span>
+        </div>
+      </div>
+      <div class="eq-toggle-group">
+        <p class="section__label">EQ</p>
+        <div class="eq-toggle" id="eq-toggle">
+          <div class="eq-toggle__half eq-toggle__half--in" id="eq-in">IN</div>
+          <div class="eq-toggle__half eq-toggle__half--out" id="eq-out">OUT</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Graphic EQ -->
+  <section class="section">
+    <p class="section__label">Graphic EQ</p>
+    <div class="geq-container" id="geq-container">
+      <div class="geq-scale" id="geq-scale"></div>
+      <div class="geq-zero-line" id="geq-zero-line"></div>
+      <!-- faders generados por JS -->
+    </div>
+  </section>
+
+  <!-- Contour -->
+  <section class="section">
+    <p class="section__label">Contour</p>
+    <div class="contour-row">
+      <div class="knob-group">
+        <svg class="knob-svg" id="knob-lp" width="64" height="64" viewBox="0 0 64 64" aria-label="Low Pass"></svg>
+        <span class="knob-label">LP</span>
+        <span class="knob-value" id="val-lp">+8</span>
+      </div>
+      <div class="knob-group">
+        <svg class="knob-svg" id="knob-hp" width="64" height="64" viewBox="0 0 64 64" aria-label="High Pass"></svg>
+        <span class="knob-label">HP</span>
+        <span class="knob-value" id="val-hp">-10</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nota -->
+  <section class="section">
+    <p class="section__label">Nota</p>
+    <div class="preset-note">
+      <p id="preset-note-text"></p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ── Datos de presets ─────────────────────────────────────── */
+const PRESETS = {
+  'davis-don': {
+    name: 'Davis Don', genre: 'Hip hop',
+    preampA: 7, preampB: 4,
+    compression: 5, eqIn: true,
+    eq: [6, 8, 5, 2, 0, -3, -5, -6, -8, -10],
+    contourLP: 8, contourHP: -10,
+    note: 'Sub gordo, ataque cortado. La <em class="accent-text">voz</em> manda; tú la sostienes.'
+  },
+  'leocadio': {
+    name: 'Leocadio', genre: 'Cumbia con acordeón',
+    preampA: 6, preampB: 5,
+    compression: 3, eqIn: true,
+    eq: [3, 6, 7, 5, 2, 0, -3, -5, -6, -8],
+    contourLP: 5, contourHP: -4,
+    note: 'Bordoneo redondo. El <em class="accent-text">acordeón</em> vive en los altos; tú no entras ahí.'
+  },
+  'juana': {
+    name: 'Juana', genre: 'Rock punk',
+    preampA: 4, preampB: 8,
+    compression: 0, eqIn: true,
+    eq: [-2, 3, 5, 6, 7, 6, 5, 4, 3, 1],
+    contourLP: -2, contourHP: 4,
+    note: 'Sin compresión, sin <em class="accent-text">disculpas</em>. Que las guitarras se peleen contigo.'
+  }
+};
+
+const FREQ_LABELS = ['30', '64', '125', '250', '500', '1k', '2k', '3k', '5k', '8k'];
+const GEQ_RANGE   = 15; // -15 a +15
+const KNOB_MIN_DEG = -135;
+const KNOB_MAX_DEG =  135;
+
+let currentPreset = 'davis-don';
+let animating = false;
+
+/* ── Knob SVG ────────────────────────────────────────────── */
+function polarToXY(cx, cy, r, deg) {
+  const rad = (deg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function describeArc(cx, cy, r, startDeg, endDeg) {
+  const s = polarToXY(cx, cy, r, startDeg);
+  const e = polarToXY(cx, cy, r, endDeg);
+  const large = (endDeg - startDeg) > 180 ? 1 : 0;
+  return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
+}
+
+function renderKnob(svgEl, value, min, max) {
+  const cx = 32, cy = 32, r = 24;
+  const pct = (value - min) / (max - min);
+  const deg = KNOB_MIN_DEG + pct * (KNOB_MAX_DEG - KNOB_MIN_DEG);
+
+  const trackPath  = describeArc(cx, cy, r, KNOB_MIN_DEG, KNOB_MAX_DEG);
+  const fillPath   = describeArc(cx, cy, r, KNOB_MIN_DEG, deg);
+  const indicator  = polarToXY(cx, cy, r - 6, deg);
+
+  svgEl.innerHTML = `
+    <circle cx="${cx}" cy="${cy}" r="${r+4}" fill="var(--color-bg-card)" stroke="var(--color-border)" stroke-width="0.5"/>
+    <path d="${trackPath}" fill="none" stroke="var(--color-bg-soft)" stroke-width="4" stroke-linecap="round"/>
+    <path d="${fillPath}"  fill="none" stroke="var(--color-accent)"   stroke-width="4" stroke-linecap="round" class="knob-arc-fill"/>
+    <line x1="${cx}" y1="${cy}" x2="${indicator.x}" y2="${indicator.y}"
+          stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" class="knob-indicator"/>
+    <circle cx="${cx}" cy="${cy}" r="3" fill="var(--color-bg-card)"/>
+  `;
+}
+
+/* ── GEQ: inicializar faders ─────────────────────────────── */
+function buildGEQ() {
+  const container = document.getElementById('geq-container');
+  // Limpiar faders viejos pero conservar escala y línea de cero
+  container.querySelectorAll('.fader-col').forEach(el => el.remove());
+
+  FREQ_LABELS.forEach((freq, i) => {
+    const col = document.createElement('div');
+    col.className = 'fader-col';
+    col.innerHTML = `
+      <div class="fader-track" id="ftrack-${i}">
+        <div class="fader-fill-pos" id="ffill-pos-${i}" style="height:0"></div>
+        <div class="fader-fill-neg" id="ffill-neg-${i}" style="height:0"></div>
+        <div class="fader-thumb"    id="fthumb-${i}" style="bottom:calc(50% - 4.5px)"></div>
+      </div>
+      <span class="fader-freq">${freq}</span>
+      <span class="fader-val zero" id="fval-${i}">0</span>
+    `;
+    container.appendChild(col);
+  });
+
+  // Escala de dB
+  const scale = document.getElementById('geq-scale');
+  const marks = ['+15','','','','+3','0','-3','','','','-15'];
+  scale.innerHTML = marks.map(m => `<span class="geq-scale__mark">${m}</span>`).join('');
+}
+
+function updateFader(i, value, trackHeight) {
+  const pct   = (value / GEQ_RANGE) * 50; // % desde el centro
+  const thumb = document.getElementById(`fthumb-${i}`);
+  const fillP = document.getElementById(`ffill-pos-${i}`);
+  const fillN = document.getElementById(`ffill-neg-${i}`);
+  const valEl = document.getElementById(`fval-${i}`);
+
+  // bottom del thumb: 50% = centro
+  const thumbBottom = 50 + pct;
+  thumb.style.bottom = `calc(${thumbBottom}% - 4.5px)`;
+
+  if (value > 0) {
+    fillP.style.height = `${pct}%`;
+    fillN.style.height = '0';
+  } else if (value < 0) {
+    fillP.style.height = '0';
+    fillN.style.height = `${Math.abs(pct)}%`;
+  } else {
+    fillP.style.height = '0';
+    fillN.style.height = '0';
+  }
+
+  const sign = value > 0 ? '+' : '';
+  valEl.textContent = value === 0 ? '0' : `${sign}${value}`;
+  valEl.className = `fader-val ${value > 0 ? 'pos' : value < 0 ? 'neg' : 'zero'}`;
+}
+
+/* ── Aplicar preset ──────────────────────────────────────── */
+function applyPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+
+  // Knobs preamp
+  renderKnob(document.getElementById('knob-tube'), p.preampA, 0, 10);
+  renderKnob(document.getElementById('knob-ss'),   p.preampB, 0, 10);
+  document.getElementById('val-tube').textContent = p.preampA.toFixed(1);
+  document.getElementById('val-ss').textContent   = p.preampB.toFixed(1);
+
+  // Compresión
+  const compLabel = p.compression === 0 ? 'OFF' : p.compression === 10 ? '∞' : String(p.compression);
+  document.getElementById('comp-display').textContent = compLabel;
+  // Fill: 10 posiciones (OFF=0, 1-9, ∞=10)
+  const compPct = (p.compression / 10) * 100;
+  document.getElementById('comp-fill').style.width = `${compPct}%`;
+
+  // EQ toggle
+  const eqIn  = document.getElementById('eq-in');
+  const eqOut = document.getElementById('eq-out');
+  if (p.eqIn) {
+    eqIn.classList.add('eq-active');
+    eqOut.classList.remove('eq-active');
+  } else {
+    eqIn.classList.remove('eq-active');
+    eqOut.classList.add('eq-active');
+  }
+
+  // Graphic EQ
+  p.eq.forEach((val, i) => updateFader(i, val));
+
+  // Contour
+  renderKnob(document.getElementById('knob-lp'), p.contourLP, -18, 18);
+  renderKnob(document.getElementById('knob-hp'), p.contourHP, -18, 18);
+  document.getElementById('val-lp').textContent = (p.contourLP >= 0 ? '+' : '') + p.contourLP;
+  document.getElementById('val-hp').textContent = (p.contourHP >= 0 ? '+' : '') + p.contourHP;
+
+  // Nota
+  document.getElementById('preset-note-text').innerHTML = p.note;
+}
+
+/* ── Pills de proyecto ───────────────────────────────────── */
+document.querySelectorAll('.project-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.project-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPreset = btn.dataset.project;
+    applyPreset(currentPreset);
+  });
+});
+
+/* ── Init ────────────────────────────────────────────────── */
+buildGEQ();
+applyPreset(currentPreset);
+</script>
+</body>
+</html>

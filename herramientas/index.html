@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Herramientas — Jorge Malgesto</title>
+  <meta name="description" content="Hartke recomendador, afinador cromático, setlist navegador.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/system.css">
+
+  <style>
+    .page {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: var(--sp-5);
+      padding-bottom: var(--sp-8);
+    }
+
+    .page-header {
+      padding: var(--sp-6) 0 var(--sp-7);
+    }
+
+    .page-header__back {
+      display: block;
+      margin-bottom: var(--sp-6);
+    }
+
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: var(--fs-h1);
+      font-weight: 500;
+      color: var(--color-text);
+      line-height: 1.2;
+      margin-bottom: var(--sp-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--font-serif);
+      font-size: var(--fs-body);
+      font-style: italic;
+      color: var(--color-text-soft);
+    }
+
+    /* ── Lista de herramientas ────────────────────────────── */
+    .tool-list {
+      display: flex;
+      flex-direction: column;
+      margin-top: var(--sp-6);
+    }
+
+    .tool-link {
+      display: block;
+      text-decoration: none;
+      border-top: var(--border-thin);
+      padding: var(--sp-5) 0;
+      transition: color 150ms ease-out;
+    }
+
+    .tool-link:last-child {
+      border-bottom: var(--border-thin);
+    }
+
+    .tool-link:hover .tool-title {
+      color: var(--color-accent);
+    }
+
+    .tool-link:hover .tool-arrow {
+      transform: translateX(4px);
+      color: var(--color-accent);
+    }
+
+    .tool-header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-4);
+      margin-bottom: var(--sp-2);
+    }
+
+    .tool-num {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-dim);
+      flex-shrink: 0;
+    }
+
+    .tool-title {
+      font-family: var(--font-serif);
+      font-size: var(--fs-h2);
+      font-weight: 500;
+      color: var(--color-text);
+      flex: 1;
+      line-height: 1.2;
+      transition: color 150ms ease-out;
+    }
+
+    .tool-arrow {
+      font-size: var(--fs-body-sans);
+      color: var(--color-text-dim);
+      transition: transform 150ms ease-out, color 150ms ease-out;
+      flex-shrink: 0;
+    }
+
+    .tool-body {
+      padding-left: calc(var(--sp-4) + 28px); /* alinea con el título */
+    }
+
+    .tool-desc {
+      font-family: var(--font-serif);
+      font-size: var(--fs-body);
+      font-style: italic;
+      color: var(--color-text-soft);
+      line-height: 1.5;
+      margin-bottom: var(--sp-2);
+    }
+
+    .tool-meta {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-text-dim);
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .page-footer {
+      margin-top: var(--sp-8);
+      padding-top: var(--sp-5);
+      border-top: var(--border-thin);
+    }
+
+    .page-footer__text {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-faint);
+    }
+
+    @media (min-width: 768px) {
+      .page { padding: var(--sp-7) var(--sp-7) var(--sp-8); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="page-header">
+    <a href="../" class="return-link page-header__back">← jorge-malgesto</a>
+    <h1 class="page-title">Herramientas</h1>
+    <p class="page-subtitle">Para el bajo, para el show, para el estudio.</p>
+  </header>
+
+  <nav class="tool-list" aria-label="Lista de herramientas">
+
+    <a href="hartke.html" class="tool-link">
+      <div class="tool-header">
+        <span class="tool-num">01 ──</span>
+        <span class="tool-title">Hartke recomendador</span>
+        <span class="tool-arrow" aria-hidden="true">→</span>
+      </div>
+      <div class="tool-body">
+        <p class="tool-desc">Presets de tono según el bajo y el proyecto.</p>
+        <span class="tool-meta">v1.0 · 2026</span>
+      </div>
+    </a>
+
+    <a href="afinador.html" class="tool-link">
+      <div class="tool-header">
+        <span class="tool-num">02 ──</span>
+        <span class="tool-title">Afinador</span>
+        <span class="tool-arrow" aria-hidden="true">→</span>
+      </div>
+      <div class="tool-body">
+        <p class="tool-desc">Cromático, con selector de fuente de audio.</p>
+        <span class="tool-meta">v1.0 · 2026</span>
+      </div>
+    </a>
+
+    <a href="setlist.html" class="tool-link">
+      <div class="tool-header">
+        <span class="tool-num">03 ──</span>
+        <span class="tool-title">Setlist navegador</span>
+        <span class="tool-arrow" aria-hidden="true">→</span>
+      </div>
+      <div class="tool-body">
+        <p class="tool-desc">Tu cuaderno de show. Sin pistas, sin internet.</p>
+        <span class="tool-meta">v1.0 · 2026</span>
+      </div>
+    </a>
+
+  </nav>
+
+  <footer class="page-footer">
+    <p class="page-footer__text">Jorge Malgesto · Herramientas · &copy; 2026</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

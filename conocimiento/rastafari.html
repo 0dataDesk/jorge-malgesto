@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rastafari — Jorge Malgesto</title>
+
+  <meta name="jm:axis" content="cultura-espiritualidad">
+  <meta name="jm:tag" content="J·M">
+  <meta name="jm:date" content="2025">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* Atmósfera propia — tierra, raíz, verde profundo */
+    :root {
+      --bg:          #080c08;
+      --bg-card:     #0d120d;
+      --bg-soft:     #121a12;
+      --text:        #e8e0cc;
+      --text-soft:   #b8a98a;
+      --text-dim:    #6b5e3a;
+      --text-faint:  #45382a;
+      --accent:      #7ab648;
+      --accent-gold: #c8922a;
+      --accent-red:  #c84030;
+      --border:      #1a2218;
+      --mono:        'JetBrains Mono', monospace;
+      --serif:       'Fraunces', Georgia, serif;
+      --sans:        'DM Sans', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100dvh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+      transition: color 150ms ease-out;
+    }
+    .return-link:hover { color: var(--text-soft); }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 32px;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .top-bar__tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Bandera sutil — tres líneas de color */
+    .colors-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 32px;
+    }
+    .colors-bar__stripe {
+      height: 3px;
+      flex: 1;
+      border-radius: 2px;
+    }
+    .colors-bar__stripe--green  { background: var(--accent); }
+    .colors-bar__stripe--gold   { background: var(--accent-gold); }
+    .colors-bar__stripe--red    { background: var(--accent-red); }
+
+    .article-header {
+      margin-bottom: 48px;
+    }
+
+    .article-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .article-title {
+      font-family: var(--serif);
+      font-size: clamp(36px, 8vw, 56px);
+      font-weight: 500;
+      font-style: italic;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .article-intro {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 400;
+      color: var(--text-soft);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    .section-divider {
+      margin: 40px 0;
+      border: none;
+      border-top: 0.5px solid var(--border);
+    }
+
+    /* Módulos */
+    .module {
+      border-top: 0.5px solid var(--border);
+      padding: 28px 0;
+    }
+    .module:last-child {
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .module__header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .module__num {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-faint);
+      flex-shrink: 0;
+      min-width: 24px;
+    }
+
+    .module__title {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 500;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.25;
+    }
+
+    .module__body {
+      padding-left: 40px;
+    }
+
+    .module__desc {
+      font-size: 15px;
+      color: var(--text-soft);
+      line-height: 1.75;
+      margin-bottom: 16px;
+    }
+
+    .module__topics {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .module__topics li {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .module__topics li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    em.g { color: var(--accent);      font-style: normal; }
+    em.o { color: var(--accent-gold); font-style: normal; }
+    em.r { color: var(--accent-red);  font-style: normal; }
+
+    .quote-block {
+      border-left: 2px solid var(--accent);
+      padding: 12px 0 12px 20px;
+      margin: 20px 0;
+    }
+
+    .quote-block p {
+      font-family: var(--serif);
+      font-size: 16px;
+      font-style: italic;
+      color: var(--text-soft);
+      line-height: 1.7;
+    }
+
+    .quote-block cite {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      font-style: normal;
+    }
+
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 0.5px solid var(--border);
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-faint);
+    }
+
+    @media (min-width: 768px) {
+      .wrap { padding: 40px 48px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="top-bar">
+    <a href="../conocimiento/" class="return-link">← jorge-malgesto / conocimiento</a>
+    <span class="top-bar__tag">Cultura y espiritualidad · J·M</span>
+  </div>
+
+  <div class="colors-bar">
+    <div class="colors-bar__stripe colors-bar__stripe--green"></div>
+    <div class="colors-bar__stripe colors-bar__stripe--gold"></div>
+    <div class="colors-bar__stripe colors-bar__stripe--red"></div>
+  </div>
+
+  <header class="article-header">
+    <p class="article-eyebrow">Rastafari</p>
+    <h1 class="article-title">Una introducción completa.</h1>
+    <p class="article-intro">
+      No es solo reggae. No es solo Marley. No es solo humo.
+      Es una teología, una filosofía política, una forma de vida que nació en Jamaica
+      en los años treinta y sigue viva, evolucionando, en todo el mundo.
+      Nueve módulos. Con respeto y sin romantización.
+    </p>
+  </header>
+
+  <hr class="section-divider">
+
+  <div class="module-list">
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">01</span>
+        <h2 class="module__title">Origen histórico</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Jamaica colonial, la coronación de Haile Selassie en 1930 y las profecías de Marcus Garvey.
+          Cómo un momento político se convirtió en <em class="g">revelación</em> para los pobres de Kingston.
+        </p>
+        <ul class="module__topics">
+          <li>Jamaica bajo el dominio británico</li>
+          <li>Marcus Garvey y el movimiento Pan-Africanista</li>
+          <li>La coronación de Ras Tafari como Haile Selassie I, Emperador de Etiopía</li>
+          <li>Los primeros comunidades rasta en los años 30-40</li>
+          <li>Leonard Howell y los primeros textos rasta</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">02</span>
+        <h2 class="module__title">Teología y cosmovisión</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Jah, Haile Selassie, Babilonia y Sión. El marco teológico rasta
+          relee la Biblia desde África, no desde Europa.
+          <em class="o">Babylon</em> no es una ciudad antigua — es cualquier sistema de opresión.
+        </p>
+        <div class="quote-block">
+          <p>"Rastafari no es una religión de muerte y más allá. Es una religión de vida y ahora."</p>
+          <cite>— Leonard Barrett, The Rastafarians (1977)</cite>
+        </div>
+        <ul class="module__topics">
+          <li>Jah como el Dios vivo y presente</li>
+          <li>La divinidad de Haile Selassie: ¿dogma o símbolo?</li>
+          <li>Babilonia como sistema colonial, capitalista, opresor</li>
+          <li>Sión / Etiopía como tierra prometida y estado mental</li>
+          <li>El concepto de I and I — no "yo y tú" sino "nosotros en Jah"</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">03</span>
+        <h2 class="module__title">Las mansiones del Rastafari</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          El movimiento no es monolítico. Bobo Ashanti, Nyahbinghi, Twelve Tribes of Israel —
+          cada mansión tiene su doctrina, sus prácticas, su relación con la Biblia.
+          Tratarlos como uno solo es el primer <em class="r">error</em> del extraño.
+        </p>
+        <ul class="module__topics">
+          <li>Nyahbinghi: los más antiguos, los más austeros</li>
+          <li>Bobo Ashanti: Emmanuel Charles Edwards y el sacerdocio</li>
+          <li>Twelve Tribes: la más abierta, la que abraza el reggae como vehículo</li>
+          <li>Ethiopian Zion Coptic Church</li>
+          <li>Diferencias doctrinales y de práctica entre mansiones</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">04</span>
+        <h2 class="module__title">Livity — la vida justa</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          <em class="g">Livity</em> es la suma de todas las prácticas: cómo comés, cómo hablás,
+          cómo te vestís, cómo tratás tu cuerpo. No son reglas — son consecuencias
+          de una cosmovisión coherente.
+        </p>
+        <ul class="module__topics">
+          <li>Ital: comida natural, sin sal procesada, sin carne (en muchas mansiones)</li>
+          <li>Los dreadlocks y el voto nazareo (Números 6)</li>
+          <li>El Iyaric o Iyaric: el idioma rasta y por qué "I" reemplaza "me"</li>
+          <li>Colores rojo, oro y verde: significado y uso</li>
+          <li>La ganja como sacramento: contexto y debate interno</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">05</span>
+        <h2 class="module__title">La Biblia leída en clave rasta</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          El texto sagrado es el mismo pero la lectura es radicalmente distinta.
+          Etiopía no es metáfora — es el centro del mundo. Los israelitas bíblicos
+          son <em class="o">africanos</em>. Babilonia es Roma, Londres, Washington.
+        </p>
+        <ul class="module__topics">
+          <li>Salmos 68:31 — "Etiopía extenderá sus manos hacia Dios"</li>
+          <li>Apocalipsis y el León de Judá</li>
+          <li>Génesis y la maldición de Canaán: la distorsión colonial que el rasta rechaza</li>
+          <li>El Kebra Nagast: la épica etíope como texto paralelo</li>
+          <li>Por qué rechazan la Versión del Rey Jacobo como traducción corrupta</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">06</span>
+        <h2 class="module__title">Música como prédica</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          El reggae no es el envoltorio del Rastafari — es su vehículo más efectivo.
+          Pero antes del reggae estuvo el nyahbinghi drumming, el burru,
+          y el mento. <em class="g">Bob Marley</em> no inventó el rasta: lo llevó al mundo.
+        </p>
+        <ul class="module__topics">
+          <li>Nyahbinghi: el tambor ceremonial como oración</li>
+          <li>Del ska al rocksteady al reggae: la evolución del tempo</li>
+          <li>Bob Marley y Peter Tosh como predicadores seculares</li>
+          <li>Burning Spear, Culture, Bunny Wailer: voces del movimiento</li>
+          <li>Dancehall y la tensión con los valores rasta tradicionales</li>
+          <li>El reggae en el bajo: el riddim como columna vertebral espiritual</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">07</span>
+        <h2 class="module__title">Pan-Africanismo y política</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          El Rastafari es inseparable de la política anti-colonial.
+          El <em class="r">repatriación</em> no es solo volver a África —
+          es desmantelar Babilonia en todos sus niveles, incluido el mental.
+        </p>
+        <ul class="module__topics">
+          <li>Marcus Garvey y el "regreso a África" como proyecto político real</li>
+          <li>Haile Selassie y la Organización de la Unidad Africana</li>
+          <li>Repatriación: literal vs. simbólica — el debate interno</li>
+          <li>El Rastafari y los movimientos de derechos civiles</li>
+          <li>Shashamane: la colonia rasta en Etiopía</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">08</span>
+        <h2 class="module__title">Después de 1975</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Haile Selassie murió en agosto de 1975 — o fue asesinado por Mengistu.
+          El movimiento enfrentó su mayor crisis teológica.
+          La respuesta de cada mansión definió quiénes son <em class="o">hoy</em>.
+        </p>
+        <ul class="module__topics">
+          <li>La muerte de Selassie: ¿cómo muere un dios vivo?</li>
+          <li>Las respuestas teológicas: negación, transformación, trascendencia</li>
+          <li>La expansión global del reggae en los 70-80</li>
+          <li>El Rastafari en el Caribe, África, Europa y América Latina</li>
+          <li>Rasta sin Jamaica: adaptaciones culturales y tensiones de autenticidad</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module__header">
+        <span class="module__num">09</span>
+        <h2 class="module__title">El Rastafari hoy</h2>
+      </div>
+      <div class="module__body">
+        <p class="module__desc">
+          Un millón de rastafaris en el mundo, según estimaciones. Reconocido por Jamaica
+          como patrimonio cultural en 2021. Debatido, adoptado, comercializado,
+          malentendido. Todavía <em class="g">vivo</em>.
+        </p>
+        <div class="quote-block">
+          <p>"El Rastafari no es una moda. Es una forma de vivir que te exige todo."</p>
+          <cite>— Conversación en Kingston, 2019</cite>
+        </div>
+        <ul class="module__topics">
+          <li>Reconocimiento legal e institucional en Jamaica</li>
+          <li>El problema de la "estética rasta" sin contenido espiritual</li>
+          <li>Mujeres en el movimiento: roles, tensiones, voces propias</li>
+          <li>Rasta y LGBTQ+: la tensión más incómoda del movimiento</li>
+          <li>El futuro: ¿adaptación o pureza doctrinal?</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /module-list -->
+
+  <footer class="footer">
+    Jorge Malgesto · Cultura y espiritualidad · 2025
+  </footer>
+
+</div>
+
+</body>
+</html>

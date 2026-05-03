@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jorge Malgesto</title>
+  <meta name="description" content="Cuaderno de un bajista que también lee.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/system.css">
+
+  <style>
+    /* ── Layout del shell ─────────────────────────────────── */
+    .shell {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .site-header {
+      padding: var(--sp-5) var(--sp-5) 0;
+    }
+
+    .site-header__meta {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-faint);
+    }
+
+    /* ── Main ─────────────────────────────────────────────── */
+    .site-main {
+      flex: 1;
+      padding: var(--sp-7) var(--sp-5) var(--sp-8);
+      max-width: 640px;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────── */
+    .hero {
+      margin-bottom: var(--sp-8);
+    }
+
+    .hero__tagline {
+      font-family: var(--font-serif);
+      font-size: var(--fs-body);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--color-text-soft);
+      margin-top: var(--sp-5);
+      line-height: 1.6;
+    }
+
+    /* ── Navegación ───────────────────────────────────────── */
+    .site-nav {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Descripción breve de sección ─────────────────────── */
+    .nav-item__desc {
+      font-family: var(--font-serif);
+      font-size: var(--fs-small);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--color-text-mute);
+      margin-top: var(--sp-1);
+      line-height: 1.4;
+      display: block;
+    }
+
+    .nav-item__content {
+      flex: 1;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .site-footer {
+      padding: var(--sp-5);
+      border-top: var(--border-thin);
+      margin-top: auto;
+    }
+
+    .site-footer__text {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-faint);
+    }
+
+    /* ── Desktop ──────────────────────────────────────────── */
+    @media (min-width: 768px) {
+      .site-header {
+        padding: var(--sp-6) var(--sp-7) 0;
+      }
+
+      .site-main {
+        padding: var(--sp-8) var(--sp-7) var(--sp-8);
+      }
+
+      .site-footer {
+        padding: var(--sp-6) var(--sp-7);
+      }
+
+      .hero {
+        margin-bottom: var(--sp-8);
+      }
+
+      .nav-item {
+        padding: var(--sp-7) 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Header -->
+  <header class="site-header">
+    <span class="site-header__meta">Cuaderno · Estudio · Práctica</span>
+  </header>
+
+  <!-- Main -->
+  <main class="site-main">
+
+    <!-- Hero -->
+    <section class="hero">
+      <span class="wordmark" aria-label="Jorge, y Malgesto.">
+        <span class="wordmark__first">jorge,</span>
+        <span class="wordmark__second">y mal<span class="wordmark__accent">gesto</span>.</span>
+      </span>
+      <p class="hero__tagline">Cuaderno de un bajista que también lee.</p>
+    </section>
+
+    <!-- Navegación -->
+    <nav class="site-nav" aria-label="Apartados del sitio">
+
+      <a href="herramientas/" class="nav-item">
+        <span class="nav-item__num">01 ──</span>
+        <span class="nav-item__content">
+          <span class="nav-item__label">Herramientas</span>
+          <span class="nav-item__desc">Hartke recomendador, afinador, setlist navegador.</span>
+        </span>
+        <span class="nav-item__arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="conocimiento/" class="nav-item">
+        <span class="nav-item__num">02 ──</span>
+        <span class="nav-item__content">
+          <span class="nav-item__label">Conocimiento</span>
+          <span class="nav-item__desc">Cine, cultura, música. Una estantería curada.</span>
+        </span>
+        <span class="nav-item__arrow" aria-hidden="true">→</span>
+      </a>
+
+    </nav>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p class="site-footer__text">Jorge Malgesto · Cuaderno personal · &copy; 2026</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

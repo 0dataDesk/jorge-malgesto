@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conocimiento — Jorge Malgesto</title>
+  <meta name="description" content="Una estantería curada. Cine, cultura, música.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/system.css">
+
+  <style>
+    .page {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: var(--sp-5);
+      padding-bottom: var(--sp-8);
+    }
+
+    .page-header {
+      padding: var(--sp-6) 0 var(--sp-7);
+    }
+
+    .page-header__back {
+      display: block;
+      margin-bottom: var(--sp-6);
+    }
+
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: var(--fs-h1);
+      font-weight: 500;
+      font-style: normal;
+      color: var(--color-text);
+      line-height: 1.2;
+      margin-bottom: var(--sp-2);
+    }
+
+    .page-subtitle {
+      font-family: var(--font-serif);
+      font-size: var(--fs-body);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--color-text-soft);
+    }
+
+    /* ── Eje temático ─────────────────────────────────────── */
+    .axis {
+      margin-top: var(--sp-7);
+    }
+
+    .axis__header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-5);
+    }
+
+    .axis__num {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-dim);
+      flex-shrink: 0;
+    }
+
+    .axis__title {
+      font-family: var(--font-serif);
+      font-size: var(--fs-h2);
+      font-weight: 500;
+      font-style: normal;
+      color: var(--color-text);
+      line-height: 1.2;
+    }
+
+    /* ── Pieza / item del eje ────────────────────────────── */
+    .piece-link {
+      display: block;
+      text-decoration: none;
+      border-top: var(--border-thin);
+      padding: var(--sp-5) 0;
+      transition: color 150ms ease-out;
+    }
+
+    .piece-link:last-child {
+      border-bottom: var(--border-thin);
+    }
+
+    .piece-link:hover .piece-title {
+      color: var(--color-accent);
+    }
+
+    .piece-header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-1);
+    }
+
+    .piece-title {
+      font-family: var(--font-serif);
+      font-size: var(--fs-h3);
+      font-weight: 500;
+      color: var(--color-text);
+      transition: color 150ms ease-out;
+      flex: 1;
+      line-height: 1.3;
+    }
+
+    .piece-tag {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-text-soft);
+      background: var(--color-bg-soft);
+      border: var(--border-thin);
+      border-radius: var(--radius-sm);
+      padding: 2px var(--sp-2);
+      flex-shrink: 0;
+    }
+
+    .piece-desc {
+      font-family: var(--font-serif);
+      font-size: var(--fs-small);
+      font-style: italic;
+      color: var(--color-text-soft);
+      line-height: 1.5;
+      margin-bottom: var(--sp-2);
+    }
+
+    .piece-meta {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-text-dim);
+    }
+
+    /* ── Sin piezas ──────────────────────────────────────── */
+    .axis__empty {
+      font-family: var(--font-serif);
+      font-size: var(--fs-body);
+      font-style: italic;
+      color: var(--color-text-faint);
+      padding: var(--sp-5) 0;
+      border-top: var(--border-thin);
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .page-footer {
+      margin-top: var(--sp-8);
+      padding-top: var(--sp-5);
+      border-top: var(--border-thin);
+    }
+
+    .page-footer__text {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-faint);
+    }
+
+    @media (min-width: 768px) {
+      .page {
+        padding: var(--sp-7) var(--sp-7) var(--sp-8);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="page-header">
+    <a href="../" class="return-link page-header__back">← jorge-malgesto</a>
+    <h1 class="page-title">Conocimiento</h1>
+    <p class="page-subtitle">Una estantería curada.</p>
+  </header>
+
+  <!-- Eje 01: Visual y técnica -->
+  <section class="axis">
+    <div class="axis__header">
+      <span class="axis__num">01 ──</span>
+      <h2 class="axis__title">Visual y técnica</h2>
+    </div>
+
+    <a href="correccion-de-color.html" class="piece-link">
+      <div class="piece-header">
+        <span class="piece-title">Corrección de color</span>
+        <span class="piece-tag">J</span>
+      </div>
+      <p class="piece-desc">Una clase completa.</p>
+      <span class="piece-meta">11 módulos · 2025</span>
+    </a>
+  </section>
+
+  <hr class="divider" style="margin-top: var(--sp-7);">
+
+  <!-- Eje 02: Cultura y espiritualidad -->
+  <section class="axis">
+    <div class="axis__header">
+      <span class="axis__num">02 ──</span>
+      <h2 class="axis__title">Cultura y espiritualidad</h2>
+    </div>
+
+    <a href="rastafari.html" class="piece-link">
+      <div class="piece-header">
+        <span class="piece-title">Rastafari</span>
+        <span class="piece-tag">J·M</span>
+      </div>
+      <p class="piece-desc">Una introducción completa.</p>
+      <span class="piece-meta">9 módulos · 2025</span>
+    </a>
+  </section>
+
+  <hr class="divider" style="margin-top: var(--sp-7);">
+
+  <!-- Eje 03: Música -->
+  <section class="axis">
+    <div class="axis__header">
+      <span class="axis__num">03 ──</span>
+      <h2 class="axis__title">Música — composición y armonía</h2>
+    </div>
+
+    <p class="axis__empty">(sin piezas todavía)</p>
+  </section>
+
+  <footer class="page-footer">
+    <p class="page-footer__text">Jorge Malgesto · Cuaderno personal · &copy; 2026</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
