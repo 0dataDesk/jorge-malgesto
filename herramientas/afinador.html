@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Afinador — Jorge Malgesto</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/system.css">
+
+  <style>
+    .page {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: var(--sp-5);
+      padding-bottom: var(--sp-8);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tool-header {
+      padding: var(--sp-6) 0 var(--sp-5);
+    }
+    .tool-header__back { display: block; margin-bottom: var(--sp-5); }
+    .tool-header__title {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-dim);
+    }
+
+    /* ── Estado inicial ────────────────────────────────────── */
+    .state { display: none; flex-direction: column; flex: 1; }
+    .state.active { display: flex; }
+
+    /* Inicio */
+    .start-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--sp-5);
+      text-align: center;
+      padding: var(--sp-7) 0;
+    }
+    .start-screen__icon {
+      width: 64px;
+      height: 64px;
+      border: var(--border-medium);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-dim);
+    }
+    .start-screen__text {
+      font-family: var(--font-serif);
+      font-size: var(--fs-body);
+      font-style: italic;
+      color: var(--color-text-soft);
+      max-width: 280px;
+      line-height: 1.6;
+    }
+
+    /* ── Selector de fuente ─────────────────────────────────── */
+    .source-section {
+      border-top: var(--border-thin);
+      padding: var(--sp-4) 0;
+    }
+    .source-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-dim);
+      margin-bottom: var(--sp-2);
+    }
+    .source-select {
+      width: 100%;
+      background: var(--color-bg-card);
+      border: var(--border-thin);
+      border-radius: var(--radius-md);
+      color: var(--color-text-soft);
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono);
+      padding: var(--sp-3) var(--sp-4);
+      appearance: none;
+      cursor: pointer;
+    }
+    .source-select:focus { outline: none; border-color: var(--color-border-soft); }
+
+    /* ── Display principal ──────────────────────────────────── */
+    .tuner-display {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-5);
+      padding: var(--sp-6) 0;
+    }
+
+    /* Nota + Hz */
+    .note-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+    .note-name {
+      font-family: var(--font-serif);
+      font-size: 88px;
+      font-weight: 500;
+      line-height: 1;
+      color: var(--color-text);
+      transition: color 200ms ease-out;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .note-name.in-tune  { color: var(--color-text); }
+    .note-name.out-tune { color: var(--color-accent); }
+    .note-name.silent   { color: var(--color-text-faint); }
+    .note-octave {
+      font-family: var(--font-mono);
+      font-size: var(--fs-h3);
+      color: var(--color-text-dim);
+      align-self: flex-end;
+      padding-bottom: 12px;
+    }
+    .note-freq {
+      font-family: var(--font-mono);
+      font-size: var(--fs-h2);
+      color: var(--color-text-soft);
+      transition: color 200ms ease-out;
+    }
+    .note-freq.silent { color: var(--color-text-faint); }
+
+    /* Indicador de cents */
+    .cents-container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .cents-bar {
+      position: relative;
+      height: 8px;
+      background: var(--color-bg-soft);
+      border-radius: var(--radius-pill);
+      overflow: visible;
+    }
+    .cents-bar__center {
+      position: absolute;
+      left: 50%;
+      top: -4px;
+      bottom: -4px;
+      width: 1px;
+      background: var(--color-border-soft);
+    }
+    .cents-indicator {
+      position: absolute;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-text-dim);
+      transform: translate(-50%, -50%);
+      transition: left 100ms ease-out, background 200ms ease-out;
+      left: 50%;
+    }
+    .cents-indicator.in-tune  { background: var(--color-text); box-shadow: 0 0 8px rgba(240,235,226,0.3); }
+    .cents-indicator.out-tune { background: var(--color-accent); }
+    .cents-indicator.silent   { background: var(--color-text-faint); }
+
+    .cents-labels {
+      display: flex;
+      justify-content: space-between;
+    }
+    .cents-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      color: var(--color-text-faint);
+    }
+    .cents-value {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono);
+      color: var(--color-text-soft);
+      text-align: center;
+      min-height: 16px;
+      transition: color 200ms ease-out;
+    }
+    .cents-value.in-tune  { color: var(--color-text-soft); }
+    .cents-value.out-tune { color: var(--color-accent); }
+    .cents-value.silent   { color: var(--color-text-faint); }
+
+    /* ── Pills de cuerdas ────────────────────────────────────── */
+    .strings-section {
+      border-top: var(--border-thin);
+      padding-top: var(--sp-4);
+    }
+    .strings-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-text-dim);
+      margin-bottom: var(--sp-3);
+    }
+    .strings-pills {
+      display: flex;
+      gap: var(--sp-2);
+      flex-wrap: wrap;
+    }
+    .string-pill {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: var(--radius-pill);
+      border: 0.5px solid var(--color-border);
+      background: transparent;
+      color: var(--color-text-mute);
+      cursor: pointer;
+      transition: all 150ms ease-out;
+      user-select: none;
+    }
+    .string-pill.nearest {
+      background: var(--color-accent-soft);
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+    .string-pill.target {
+      background: var(--color-bg-soft);
+      color: var(--color-text-soft);
+      border-color: var(--color-border-soft);
+    }
+
+    /* Drop D toggle */
+    .drop-d-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-3);
+    }
+    .drop-d-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-text-dim);
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--color-bg-soft);
+      border: var(--border-thin);
+      border-radius: var(--radius-pill);
+      transition: background 200ms ease-out;
+    }
+    .toggle-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 12px; height: 12px;
+      background: var(--color-text-mute);
+      border-radius: 50%;
+      transition: transform 200ms ease-out, background 200ms ease-out;
+    }
+    .toggle-switch input:checked ~ .toggle-track { background: var(--color-accent-soft); border-color: var(--color-accent); }
+    .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(16px); background: var(--color-accent); }
+
+    /* ── Error ────────────────────────────────────────────── */
+    .error-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--sp-4);
+      text-align: center;
+    }
+    .error-screen__msg {
+      font-family: var(--font-serif);
+      font-size: var(--fs-body);
+      font-style: italic;
+      color: var(--color-accent);
+    }
+
+    /* ── Botón stop ───────────────────────────────────────── */
+    .stop-btn {
+      margin-top: auto;
+      padding-top: var(--sp-5);
+    }
+
+    @media (min-width: 768px) {
+      .page { padding: var(--sp-7); }
+      .note-name { font-size: 110px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="tool-header">
+    <a href="../herramientas/" class="return-link tool-header__back">← Herramientas</a>
+    <p class="tool-header__title">Afinador</p>
+  </header>
+
+  <!-- Estado: inicio -->
+  <div class="state active" id="state-start">
+    <div class="start-screen">
+      <div class="start-screen__icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8"  y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
+      <p class="start-screen__text">Permite acceso al micrófono o conecta tu bajo por jack/USB.</p>
+      <button class="btn btn--primary" id="btn-start">Iniciar afinador</button>
+    </div>
+  </div>
+
+  <!-- Estado: activo -->
+  <div class="state" id="state-active">
+
+    <div class="source-section">
+      <p class="source-label">Fuente de audio</p>
+      <select class="source-select" id="source-select">
+        <option value="">Micrófono interno</option>
+      </select>
+    </div>
+
+    <div class="tuner-display">
+      <!-- Nota + Hz -->
+      <div class="note-display">
+        <div class="note-name silent" id="note-name">
+          <span id="note-letter">·</span>
+          <span class="note-octave" id="note-octave"></span>
+        </div>
+        <span class="note-freq silent" id="note-freq">— Hz</span>
+      </div>
+
+      <!-- Cents -->
+      <div class="cents-container">
+        <div class="cents-bar">
+          <div class="cents-bar__center"></div>
+          <div class="cents-indicator silent" id="cents-indicator"></div>
+        </div>
+        <div class="cents-labels">
+          <span class="cents-label">-50</span>
+          <span class="cents-value silent" id="cents-value">— cents</span>
+          <span class="cents-label">+50</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cuerdas -->
+    <div class="strings-section">
+      <p class="strings-label">Cuerdas estándar</p>
+      <div class="strings-pills" id="strings-pills"></div>
+      <div class="drop-d-row">
+        <label class="toggle-switch" for="drop-d">
+          <input type="checkbox" id="drop-d">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+        <span class="drop-d-label" onclick="document.getElementById('drop-d').click()">Drop D</span>
+      </div>
+    </div>
+
+    <div class="stop-btn">
+      <button class="btn btn--ghost" id="btn-stop">Detener</button>
+    </div>
+
+  </div>
+
+  <!-- Estado: error -->
+  <div class="state" id="state-error">
+    <div class="error-screen">
+      <p class="error-screen__msg" id="error-msg">No se pudo acceder al micrófono.</p>
+      <button class="btn btn--ghost" id="btn-retry">Reintentar</button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { detectPitchYIN, freqToNote, nearestString, BASS_STRINGS_STANDARD, BASS_STRINGS_DROP_D } from '../js/pitch-detection.js';
+
+/* ── Estado de la app ──────────────────────────────────────── */
+let audioCtx    = null;
+let stream      = null;
+let analyser    = null;
+let rafId       = null;
+let dropD       = false;
+let targetStr   = null;
+let buffer      = null;
+
+const TUNE_THRESHOLD = 5; // cents
+
+/* ── Elementos DOM ─────────────────────────────────────────── */
+const states = {
+  start:  document.getElementById('state-start'),
+  active: document.getElementById('state-active'),
+  error:  document.getElementById('state-error'),
+};
+
+function showState(name) {
+  Object.values(states).forEach(el => el.classList.remove('active'));
+  states[name].classList.add('active');
+}
+
+/* ── Fuentes de audio ──────────────────────────────────────── */
+async function listSources() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const inputs  = devices.filter(d => d.kind === 'audioinput');
+    const sel     = document.getElementById('source-select');
+    sel.innerHTML = '';
+    inputs.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value       = d.deviceId;
+      opt.textContent = d.label || 'Micrófono';
+      sel.appendChild(opt);
+    });
+  } catch {}
+}
+
+/* ── Iniciar audio ─────────────────────────────────────────── */
+async function startTuner(deviceId) {
+  try {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+
+    const constraints = {
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl:  false,
+        ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
+      }
+    };
+
+    stream   = await navigator.mediaDevices.getUserMedia(constraints);
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // iOS: reanudar contexto tras gesto
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+    analyser            = audioCtx.createAnalyser();
+    analyser.fftSize    = 4096;
+    buffer              = new Float32Array(analyser.fftSize);
+
+    const src = audioCtx.createMediaStreamSource(stream);
+    src.connect(analyser);
+
+    await listSources();
+    buildStringPills();
+    showState('active');
+    tick();
+
+  } catch (err) {
+    document.getElementById('error-msg').textContent =
+      err.name === 'NotAllowedError'
+        ? 'Permiso denegado. Habilita el micrófono en la configuración del navegador.'
+        : 'No se pudo acceder al audio. Verifica tu dispositivo.';
+    showState('error');
+  }
+}
+
+function stopTuner() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  resetDisplay();
+  showState('start');
+}
+
+/* ── Loop de detección ─────────────────────────────────────── */
+function tick() {
+  rafId = requestAnimationFrame(tick);
+  analyser.getFloatTimeDomainData(buffer);
+
+  // Detectar si hay señal
+  const rms = Math.sqrt(buffer.reduce((s, v) => s + v * v, 0) / buffer.length);
+  if (rms < 0.003) { setDisplay(null); return; }
+
+  const freq = detectPitchYIN(buffer, audioCtx.sampleRate);
+  if (freq > 0) {
+    const note = freqToNote(freq);
+    setDisplay(note);
+  } else {
+    setDisplay(null);
+  }
+}
+
+/* ── Actualizar UI ─────────────────────────────────────────── */
+function setDisplay(note) {
+  const letterEl    = document.getElementById('note-letter');
+  const octaveEl    = document.getElementById('note-octave');
+  const freqEl      = document.getElementById('note-freq');
+  const centsEl     = document.getElementById('cents-value');
+  const indicatorEl = document.getElementById('cents-indicator');
+  const nameEl      = document.getElementById('note-name');
+
+  if (!note) {
+    resetDisplay();
+    highlightNearestPill(null);
+    return;
+  }
+
+  const { noteName, octave, cents, freq } = note;
+  const inTune = Math.abs(cents) <= TUNE_THRESHOLD;
+  const cls    = inTune ? 'in-tune' : 'out-tune';
+
+  letterEl.textContent = noteName;
+  octaveEl.textContent = octave;
+  freqEl.textContent   = `${freq.toFixed(1)} Hz`;
+  centsEl.textContent  = cents === 0 ? '0 cents' : `${cents > 0 ? '+' : ''}${cents} cents`;
+
+  nameEl.className      = `note-name ${cls}`;
+  freqEl.className      = `note-freq ${cls}`;
+  centsEl.className     = `cents-value ${cls}`;
+  indicatorEl.className = `cents-indicator ${cls}`;
+
+  // Posición del indicador: cents va de -50 a +50
+  const clamped = Math.max(-50, Math.min(50, cents));
+  const pct     = ((clamped + 50) / 100) * 100;
+  indicatorEl.style.left = `${pct}%`;
+
+  // Resaltar cuerda más cercana
+  const nearest = nearestString(freq, dropD);
+  highlightNearestPill(nearest.name + nearest.octave);
+}
+
+function resetDisplay() {
+  document.getElementById('note-letter').textContent    = '·';
+  document.getElementById('note-octave').textContent    = '';
+  document.getElementById('note-freq').textContent      = '— Hz';
+  document.getElementById('cents-value').textContent    = '— cents';
+  document.getElementById('note-name').className        = 'note-name silent';
+  document.getElementById('note-freq').className        = 'note-freq silent';
+  document.getElementById('cents-value').className      = 'cents-value silent';
+  document.getElementById('cents-indicator').className  = 'cents-indicator silent';
+  document.getElementById('cents-indicator').style.left = '50%';
+}
+
+/* ── Pills de cuerdas ──────────────────────────────────────── */
+function buildStringPills() {
+  const strings = dropD ? BASS_STRINGS_DROP_D : BASS_STRINGS_STANDARD;
+  const container = document.getElementById('strings-pills');
+  container.innerHTML = '';
+  strings.forEach(str => {
+    const btn = document.createElement('button');
+    btn.className    = 'string-pill';
+    btn.textContent  = `${str.name}${str.octave}`;
+    btn.dataset.key  = str.name + str.octave;
+    btn.dataset.freq = str.freq;
+    btn.addEventListener('click', () => {
+      targetStr = targetStr === btn.dataset.key ? null : btn.dataset.key;
+      document.querySelectorAll('.string-pill').forEach(b => b.classList.remove('target'));
+      if (targetStr) btn.classList.add('target');
+    });
+    container.appendChild(btn);
+  });
+}
+
+function highlightNearestPill(key) {
+  document.querySelectorAll('.string-pill').forEach(btn => {
+    btn.classList.remove('nearest');
+    if (key && btn.dataset.key === key && !btn.classList.contains('target')) {
+      btn.classList.add('nearest');
+    }
+  });
+}
+
+/* ── Eventos ─────────────────────────────────────────────────── */
+document.getElementById('btn-start').addEventListener('click', async () => {
+  // iOS: el AudioContext necesita gesto del usuario
+  await startTuner('');
+});
+
+document.getElementById('btn-stop').addEventListener('click', stopTuner);
+document.getElementById('btn-retry').addEventListener('click', () => startTuner(''));
+
+document.getElementById('source-select').addEventListener('change', e => {
+  startTuner(e.target.value);
+});
+
+document.getElementById('drop-d').addEventListener('change', e => {
+  dropD = e.target.checked;
+  targetStr = null;
+  buildStringPills();
+});
+</script>
+</body>
+</html>
