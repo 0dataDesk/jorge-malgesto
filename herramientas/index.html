@@ -48,7 +48,7 @@
       position: fixed;
       inset: 0;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       padding: 72px 28px 28px;
       filter: blur(10px) brightness(0.22) saturate(0.5);
@@ -398,7 +398,7 @@
 
     /* ─── Responsive ─────────────────────────────────────────── */
     @media (max-width: 640px) {
-      .preview { grid-template-columns: 1fr; padding: 60px 16px 16px; }
+      .preview { grid-template-columns: repeat(2, 1fr); padding: 60px 16px 16px; }
       .gate-top { padding: 16px 20px; }
       .gate-main { padding: 16px; }
     }
@@ -464,6 +464,42 @@
         <div class="fake-row-info">
           <div class="fake-row-title" style="width:80%"></div>
           <div class="fake-row-meta" style="width:50%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leocadio · Repertorio -->
+  <div class="preview-card">
+    <span class="p-num">04</span>
+    <div class="p-name">Leocadio</div>
+    <div class="fake-setlist">
+      <div class="fake-row">
+        <span class="fake-row-num">01</span>
+        <div class="fake-row-info">
+          <div class="fake-row-title" style="width:75%"></div>
+          <div class="fake-row-meta" style="width:40%"></div>
+        </div>
+      </div>
+      <div class="fake-row">
+        <span class="fake-row-num">02</span>
+        <div class="fake-row-info">
+          <div class="fake-row-title" style="width:60%"></div>
+          <div class="fake-row-meta" style="width:30%"></div>
+        </div>
+      </div>
+      <div class="fake-row">
+        <span class="fake-row-num">03</span>
+        <div class="fake-row-info">
+          <div class="fake-row-title" style="width:85%"></div>
+          <div class="fake-row-meta" style="width:45%"></div>
+        </div>
+      </div>
+      <div class="fake-row">
+        <span class="fake-row-num">04</span>
+        <div class="fake-row-info">
+          <div class="fake-row-title" style="width:50%"></div>
+          <div class="fake-row-meta" style="width:35%"></div>
         </div>
       </div>
     </div>
