@@ -4,204 +4,514 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Herramientas — Jorge Malgesto</title>
-  <meta name="description" content="Hartke recomendador, afinador cromático, setlist navegador.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../css/system.css">
-
   <style>
-    .page {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: var(--sp-5);
-      padding-bottom: var(--sp-8);
+    :root {
+      --bg:          #0d0d0d;
+      --bg-card:     #141414;
+      --bg-soft:     #1a1814;
+      --text:        #f0ebe2;
+      --text-soft:   #d8d1c2;
+      --text-mute:   #8a8275;
+      --text-dim:    #6b6258;
+      --text-faint:  #3a332a;
+      --accent:      #d44530;
+      --border:      #2a2620;
+      --border-soft: #3a342c;
+      --serif:       'Fraunces', Georgia, serif;
+      --sans:        'DM Sans', system-ui, sans-serif;
+      --mono:        'JetBrains Mono', monospace;
     }
 
-    .page-header {
-      padding: var(--sp-6) 0 var(--sp-7);
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
     }
 
-    .page-header__back {
-      display: block;
-      margin-bottom: var(--sp-6);
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .page-title {
-      font-family: var(--font-serif);
-      font-size: var(--fs-h1);
-      font-weight: 500;
-      color: var(--color-text);
-      line-height: 1.2;
-      margin-bottom: var(--sp-2);
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── Preview difuminado ─────────────────────────────────── */
+    .preview {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 72px 28px 28px;
+      filter: blur(10px) brightness(0.22) saturate(0.5);
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
     }
 
-    .page-subtitle {
-      font-family: var(--font-serif);
-      font-size: var(--fs-body);
-      font-style: italic;
-      color: var(--color-text-soft);
-    }
-
-    /* ── Lista de herramientas ────────────────────────────── */
-    .tool-list {
+    .preview-card {
+      background: var(--bg-soft);
+      border: 0.5px solid var(--border);
+      border-radius: 10px;
+      padding: 28px;
       display: flex;
       flex-direction: column;
-      margin-top: var(--sp-6);
+      gap: 14px;
+      overflow: hidden;
     }
 
-    .tool-link {
-      display: block;
-      text-decoration: none;
-      border-top: var(--border-thin);
-      padding: var(--sp-5) 0;
-      transition: color 150ms ease-out;
-    }
-
-    .tool-link:last-child {
-      border-bottom: var(--border-thin);
-    }
-
-    .tool-link:hover .tool-title {
-      color: var(--color-accent);
-    }
-
-    .tool-link:hover .tool-arrow {
-      transform: translateX(4px);
-      color: var(--color-accent);
-    }
-
-    .tool-header {
-      display: flex;
-      align-items: baseline;
-      gap: var(--sp-4);
-      margin-bottom: var(--sp-2);
-    }
-
-    .tool-num {
-      font-family: var(--font-mono);
-      font-size: var(--fs-mono-sm);
-      font-weight: 400;
+    .p-num {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--color-text-dim);
-      flex-shrink: 0;
+      color: var(--text-dim);
     }
 
-    .tool-title {
-      font-family: var(--font-serif);
-      font-size: var(--fs-h2);
+    .p-name {
+      font-family: var(--serif);
+      font-size: 26px;
       font-weight: 500;
-      color: var(--color-text);
-      flex: 1;
-      line-height: 1.2;
-      transition: color 150ms ease-out;
+      color: var(--text);
+      line-height: 1.1;
     }
 
-    .tool-arrow {
-      font-size: var(--fs-body-sans);
-      color: var(--color-text-dim);
-      transition: transform 150ms ease-out, color 150ms ease-out;
+    /* Hartke — fake EQ faders */
+    .fake-eq {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 80px;
+      margin-top: 8px;
+    }
+
+    .fake-eq-bar {
+      flex: 1;
+      background: var(--text-faint);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .fake-eq-bar::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 8px;
+      background: var(--text-mute);
+      border-radius: 2px;
+      top: 0;
+    }
+
+    /* Afinador — fake display */
+    .fake-tuner {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .fake-note {
+      font-family: var(--serif);
+      font-size: 72px;
+      font-weight: 500;
+      font-style: italic;
+      color: var(--text-soft);
+      line-height: 1;
+    }
+
+    .fake-hz {
+      font-family: var(--mono);
+      font-size: 20px;
+      color: var(--text-dim);
+    }
+
+    .fake-bar {
+      height: 6px;
+      background: var(--bg-card);
+      border-radius: 99px;
+      position: relative;
+      margin-top: 4px;
+    }
+
+    .fake-dot {
+      position: absolute;
+      top: 50%;
+      left: 53%;
+      width: 14px;
+      height: 14px;
+      background: var(--text);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Setlist — fake rows */
+    .fake-setlist {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 8px;
+    }
+
+    .fake-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .fake-row-num {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-faint);
+      flex-shrink: 0;
+      width: 16px;
+    }
+
+    .fake-row-info {
+      flex: 1;
+    }
+
+    .fake-row-title {
+      height: 10px;
+      background: var(--text-mute);
+      border-radius: 2px;
+      width: 70%;
+      margin-bottom: 5px;
+    }
+
+    .fake-row-meta {
+      height: 7px;
+      background: var(--text-faint);
+      border-radius: 2px;
+      width: 45%;
+    }
+
+    /* Vignette radial sobre el preview */
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: radial-gradient(
+        ellipse 75% 70% at 50% 50%,
+        rgba(13, 13, 13, 0.15) 0%,
+        rgba(13, 13, 13, 0.55) 55%,
+        rgba(13, 13, 13, 0.93) 80%,
+        var(--bg) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* ─── Gate ───────────────────────────────────────────────── */
+    .gate {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top bar */
+    .gate-top {
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       flex-shrink: 0;
     }
 
-    .tool-body {
-      padding-left: calc(var(--sp-4) + 28px); /* alinea con el título */
-    }
-
-    .tool-desc {
-      font-family: var(--font-serif);
-      font-size: var(--fs-body);
-      font-style: italic;
-      color: var(--color-text-soft);
-      line-height: 1.5;
-      margin-bottom: var(--sp-2);
-    }
-
-    .tool-meta {
-      font-family: var(--font-mono);
-      font-size: var(--fs-mono-sm);
-      font-weight: 400;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--color-text-dim);
-    }
-
-    /* ── Footer ──────────────────────────────────────────── */
-    .page-footer {
-      margin-top: var(--sp-8);
-      padding-top: var(--sp-5);
-      border-top: var(--border-thin);
-    }
-
-    .page-footer__text {
-      font-family: var(--font-mono);
-      font-size: var(--fs-mono-sm);
+    .return-link {
+      font-family: var(--mono);
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.18em;
-      color: var(--color-text-faint);
+      color: var(--text-dim);
+      transition: color 150ms;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    @media (min-width: 768px) {
-      .page { padding: var(--sp-7) var(--sp-7) var(--sp-8); }
+    .return-link:hover { color: var(--text-soft); }
+
+    .gate-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-faint);
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 4px;
+    }
+
+    /* Main gate content */
+    .gate-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    /* Lock mark */
+    .lock-ring {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 0.5px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 44px;
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { border-color: var(--border); }
+      50%       { border-color: var(--border-soft); }
+    }
+
+    .lock-ring svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-dim);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .gate-title {
+      font-family: var(--serif);
+      font-size: clamp(48px, 11vw, 88px);
+      font-weight: 500;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.025em;
+      margin-bottom: 24px;
+    }
+
+    .gate-desc {
+      font-family: var(--serif);
+      font-size: clamp(15px, 2.5vw, 17px);
+      font-weight: 400;
+      color: var(--text-dim);
+      max-width: 380px;
+      line-height: 1.75;
+      margin-bottom: 52px;
+    }
+
+    /* Separator */
+    .gate-sep {
+      width: 0.5px;
+      height: 44px;
+      background: var(--border);
+      margin-bottom: 44px;
+    }
+
+    .gate-access-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--text-faint);
+      margin-bottom: 18px;
+    }
+
+    .gate-ig {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: transform 200ms ease-out;
+    }
+
+    .gate-ig:hover { transform: translateY(-3px); }
+
+    .gate-ig-handle {
+      font-family: var(--serif);
+      font-size: clamp(26px, 5vw, 40px);
+      font-weight: 500;
+      color: var(--accent);
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    .gate-ig-cta {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+      transition: color 200ms;
+    }
+
+    .gate-ig:hover .gate-ig-cta { color: var(--text-mute); }
+
+    /* Bottom */
+    .gate-bottom {
+      padding: 16px 28px;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .gate-bottom span {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-faint);
+    }
+
+    /* ─── Entrada animada ────────────────────────────────────── */
+    .gate-main > * {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: rise 0.6s ease-out forwards;
+    }
+
+    .lock-ring       { animation-delay: 0.05s; }
+    .gate-title      { animation-delay: 0.15s; }
+    .gate-desc       { animation-delay: 0.25s; }
+    .gate-sep        { animation-delay: 0.33s; }
+    .gate-access-label { animation-delay: 0.4s; }
+    .gate-ig         { animation-delay: 0.48s; }
+
+    @keyframes rise {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .preview { grid-template-columns: 1fr; padding: 60px 16px 16px; }
+      .gate-top { padding: 16px 20px; }
+      .gate-main { padding: 16px; }
     }
   </style>
 </head>
 <body>
 
-<div class="page">
+<!-- Preview borroso al fondo -->
+<div class="preview" aria-hidden="true">
 
-  <header class="page-header">
-    <a href="../" class="return-link page-header__back">← jorge-malgesto</a>
-    <h1 class="page-title">Herramientas</h1>
-    <p class="page-subtitle">Para el bajo, para el show, para el estudio.</p>
-  </header>
+  <!-- Hartke -->
+  <div class="preview-card">
+    <span class="p-num">01</span>
+    <div class="p-name">Hartke HA3500</div>
+    <div class="fake-eq">
+      <div class="fake-eq-bar" style="height:62%"></div>
+      <div class="fake-eq-bar" style="height:78%"></div>
+      <div class="fake-eq-bar" style="height:68%"></div>
+      <div class="fake-eq-bar" style="height:52%"></div>
+      <div class="fake-eq-bar" style="height:38%"></div>
+      <div class="fake-eq-bar" style="height:26%"></div>
+      <div class="fake-eq-bar" style="height:18%"></div>
+      <div class="fake-eq-bar" style="height:12%"></div>
+      <div class="fake-eq-bar" style="height:8%"></div>
+      <div class="fake-eq-bar" style="height:5%"></div>
+    </div>
+  </div>
 
-  <nav class="tool-list" aria-label="Lista de herramientas">
-
-    <a href="hartke.html" class="tool-link">
-      <div class="tool-header">
-        <span class="tool-num">01 ──</span>
-        <span class="tool-title">Hartke recomendador</span>
-        <span class="tool-arrow" aria-hidden="true">→</span>
+  <!-- Afinador -->
+  <div class="preview-card">
+    <span class="p-num">02</span>
+    <div class="p-name">Afinador</div>
+    <div class="fake-tuner">
+      <div class="fake-note">E</div>
+      <div class="fake-hz">41.2 Hz</div>
+      <div class="fake-bar">
+        <div class="fake-dot"></div>
       </div>
-      <div class="tool-body">
-        <p class="tool-desc">Presets de tono según el bajo y el proyecto.</p>
-        <span class="tool-meta">v1.0 · 2026</span>
+    </div>
+  </div>
+
+  <!-- Setlist -->
+  <div class="preview-card">
+    <span class="p-num">03</span>
+    <div class="p-name">Setlist</div>
+    <div class="fake-setlist">
+      <div class="fake-row">
+        <span class="fake-row-num">01</span>
+        <div class="fake-row-info">
+          <div class="fake-row-title"></div>
+          <div class="fake-row-meta"></div>
+        </div>
       </div>
+      <div class="fake-row">
+        <span class="fake-row-num">02</span>
+        <div class="fake-row-info">
+          <div class="fake-row-title" style="width:55%"></div>
+          <div class="fake-row-meta" style="width:35%"></div>
+        </div>
+      </div>
+      <div class="fake-row">
+        <span class="fake-row-num">03</span>
+        <div class="fake-row-info">
+          <div class="fake-row-title" style="width:80%"></div>
+          <div class="fake-row-meta" style="width:50%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Vignette -->
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- Gate -->
+<div class="gate">
+
+  <div class="gate-top">
+    <a href="../" class="return-link">← jorge-malgesto</a>
+    <span class="gate-badge">Suite · Herramientas</span>
+  </div>
+
+  <div class="gate-main">
+
+    <div class="lock-ring">
+      <svg viewBox="0 0 24 24">
+        <rect x="5" y="11" width="14" height="11" rx="2" ry="2"/>
+        <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+      </svg>
+    </div>
+
+    <h1 class="gate-title">Para los míos.</h1>
+
+    <p class="gate-desc">
+      Las construí para tocar, practicar y prepararme para el show.
+      No son para todo el mundo — y eso es exactamente el punto.
+    </p>
+
+    <div class="gate-sep"></div>
+
+    <p class="gate-access-label">Acceso por invitación</p>
+
+    <a href="https://instagram.com/jorgemalgesto" class="gate-ig" target="_blank" rel="noopener noreferrer">
+      <span class="gate-ig-handle">@jorgemalgesto</span>
+      <span class="gate-ig-cta">Sígueme ahí y cuéntame →</span>
     </a>
 
-    <a href="afinador.html" class="tool-link">
-      <div class="tool-header">
-        <span class="tool-num">02 ──</span>
-        <span class="tool-title">Afinador</span>
-        <span class="tool-arrow" aria-hidden="true">→</span>
-      </div>
-      <div class="tool-body">
-        <p class="tool-desc">Cromático, con selector de fuente de audio.</p>
-        <span class="tool-meta">v1.0 · 2026</span>
-      </div>
-    </a>
+  </div>
 
-    <a href="setlist.html" class="tool-link">
-      <div class="tool-header">
-        <span class="tool-num">03 ──</span>
-        <span class="tool-title">Setlist navegador</span>
-        <span class="tool-arrow" aria-hidden="true">→</span>
-      </div>
-      <div class="tool-body">
-        <p class="tool-desc">Tu cuaderno de show. Sin pistas, sin internet.</p>
-        <span class="tool-meta">v1.0 · 2026</span>
-      </div>
-    </a>
-
-  </nav>
-
-  <footer class="page-footer">
-    <p class="page-footer__text">Jorge Malgesto · Herramientas · &copy; 2026</p>
-  </footer>
+  <div class="gate-bottom">
+    <span>Jorge Malgesto · Suite personal · 2026</span>
+  </div>
 
 </div>
 

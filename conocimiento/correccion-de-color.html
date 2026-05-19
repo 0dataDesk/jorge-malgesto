@@ -1,471 +1,1859 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Corrección de color — Jorge Malgesto</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corrección de Color · Una clase completa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0d;
+    --bg-2: #13131a;
+    --bg-3: #1d1d27;
+    --bg-card: #16161e;
+    --ink: #f4eee3;
+    --ink-soft: #d8d1c2;
+    --ink-dim: #a9a193;
+    --ink-faint: #5c5546;
 
-  <meta name="jm:axis" content="visual-tecnica">
-  <meta name="jm:tag" content="J">
-  <meta name="jm:date" content="2025">
+    --orange: #ff8c42;
+    --amber: #ffbd59;
+    --teal: #2dd4bf;
+    --cyan: #38bdf8;
+    --magenta: #e879f9;
+    --crimson: #ef4444;
+    --lime: #a3e635;
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    --rule: rgba(244, 238, 227, 0.09);
+    --rule-strong: rgba(244, 238, 227, 0.2);
 
-  <style>
-    /* Atmósfera propia — visual, técnica, clínica */
-    :root {
-      --bg:        #0a0c0f;
-      --bg-card:   #111418;
-      --text:      #dce3ec;
-      --text-soft: #9aabb8;
-      --text-dim:  #55687a;
-      --accent:    #4a9eca;
-      --border:    #1e2830;
-      --mono:      'JetBrains Mono', monospace;
-      --serif:     'Fraunces', Georgia, serif;
-      --sans:      'DM Sans', system-ui, sans-serif;
+    --display: 'Fraunces', ui-serif, Georgia, serif;
+    --body: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.65;
+    font-feature-settings: "ss01", "kern";
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Film grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    z-index: 200;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+
+  /* Top progress bar */
+  .progress {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 300;
+  }
+  .progress__bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--orange), var(--amber), var(--teal), var(--cyan));
+    transition: width 0.1s linear;
+  }
+
+  /* Layout */
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ==== HERO ==== */
+  .hero {
+    padding: 140px 0 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero__eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero__eyebrow::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--ink-dim);
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: clamp(52px, 9vw, 128px);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    margin-bottom: 48px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 500;
+    background: linear-gradient(92deg, var(--orange) 10%, var(--amber) 40%, var(--teal) 70%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero__lead {
+    max-width: 640px;
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 56px;
+  }
+  .hero__meta {
+    display: flex;
+    gap: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+  .hero__meta > div { font-family: var(--mono); font-size: 12px; }
+  .hero__meta > div span {
+    display: block;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-size: 10px;
+  }
+  .hero__meta > div strong {
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  /* Floating color blobs in hero */
+  .hero__blobs {
+    position: absolute;
+    top: 0; right: -10%;
+    width: 60%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.55;
+    z-index: -1;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+  }
+  .blob--1 { width: 400px; height: 400px; background: var(--orange); top: 10%; right: 20%; }
+  .blob--2 { width: 350px; height: 350px; background: var(--teal); top: 40%; right: 5%; }
+  .blob--3 { width: 280px; height: 280px; background: var(--magenta); top: 65%; right: 35%; opacity: 0.6; }
+
+  /* ==== TOC ==== */
+  .toc {
+    padding: 80px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .toc__title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 40px;
+  }
+  .toc__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+  }
+  .toc__list li {
+    border-top: 1px solid var(--rule);
+    padding: 20px 0;
+  }
+  .toc__list li:nth-child(-n+2) { border-top: none; }
+  .toc__list a {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .toc__list a:hover { color: var(--amber); transform: translateX(6px); }
+  .toc__list .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 32px;
+  }
+  .toc__list .label {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @media (max-width: 720px) {
+    .toc__list { grid-template-columns: 1fr; }
+    .toc__list li:nth-child(2) { border-top: 1px solid var(--rule); }
+  }
+
+  /* ==== MODULE ==== */
+  .module {
+    padding: 120px 0;
+    position: relative;
+  }
+  .module + .module {
+    border-top: 1px solid var(--rule);
+  }
+  .module__header {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 48px;
+    margin-bottom: 64px;
+    align-items: start;
+  }
+  .module__num {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--ink-faint);
+    letter-spacing: 0.2em;
+    padding-top: 14px;
+  }
+  .module__title {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(38px, 5.5vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 144;
+  }
+  .module__title em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--amber);
+  }
+  .module__kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 20px;
+  }
+  .module__body {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 48px;
+  }
+  .module__body > * { grid-column: 2; }
+  .module__body > .full { grid-column: 1 / -1; }
+
+  @media (max-width: 720px) {
+    .module__header, .module__body {
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
+    .module__body > * { grid-column: 1; }
+    .module__body > .full { grid-column: 1; }
+  }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Prose */
+  .prose p { margin-bottom: 22px; color: var(--ink-soft); max-width: 68ch; }
+  .prose p.lead {
+    font-size: 22px;
+    line-height: 1.55;
+    color: var(--ink);
+    font-weight: 400;
+    max-width: 680px;
+    margin-bottom: 36px;
+  }
+  .prose strong { color: var(--ink); font-weight: 600; }
+  .prose em { font-style: italic; color: var(--amber); }
+  .prose h3 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 28px;
+    font-style: italic;
+    margin: 56px 0 20px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .prose h4 {
+    font-family: var(--body);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--amber);
+    margin: 32px 0 12px;
+    font-weight: 600;
+  }
+  .prose ul, .prose ol {
+    margin: 16px 0 28px 24px;
+    color: var(--ink-soft);
+  }
+  .prose li { margin-bottom: 10px; }
+  .prose code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--bg-3);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--amber);
+  }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 16px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      min-height: 100dvh;
-    }
+  /* Pull quote */
+  .pull {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(26px, 3.2vw, 38px);
+    line-height: 1.3;
+    color: var(--ink);
+    padding: 40px 0 40px 32px;
+    border-left: 2px solid var(--orange);
+    margin: 48px 0;
+    max-width: 780px;
+  }
+  .pull span {
+    display: block;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-style: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
 
-    a { color: inherit; text-decoration: none; }
+  /* Two-column compare (correction vs grading) */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: var(--rule);
+    margin: 40px 0;
+    border: 1px solid var(--rule);
+  }
+  .compare > div {
+    background: var(--bg-card);
+    padding: 36px 32px;
+  }
+  .compare__tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .compare > div:first-child .compare__tag { color: var(--teal); }
+  .compare > div:last-child .compare__tag { color: var(--orange); }
+  .compare h4 {
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+  .compare p { font-size: 15px; color: var(--ink-dim); margin-bottom: 12px; }
+  .compare__goal {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--rule-strong);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  @media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
 
-    .return-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--text-dim);
-      transition: color 150ms ease-out;
-    }
-    .return-link:hover { color: var(--text-soft); }
+  /* Cards grid */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 32px 0;
+  }
+  .card {
+    background: var(--bg-card);
+    padding: 28px 26px;
+  }
+  .card__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 12px;
+  }
+  .card h5 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 22px;
+    font-style: italic;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .card p { font-size: 14px; color: var(--ink-dim); line-height: 1.55; }
 
-    .wrap {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 24px 20px 80px;
-    }
+  /* Color swatches / log visualization */
+  .log-demo {
+    margin: 40px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    padding: 32px;
+  }
+  .log-demo__row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 24px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .log-demo__row:last-child { margin-bottom: 0; }
+  .log-demo__label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-dim);
+  }
+  .log-demo__label strong { color: var(--ink); display: block; margin-bottom: 4px; font-size: 13px; }
+  .log-strip {
+    height: 48px;
+    display: flex;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .log-strip span { flex: 1; }
 
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 32px;
-      border-bottom: 0.5px solid var(--border);
-      margin-bottom: 48px;
-    }
+  /* Scope illustrations */
+  .scope-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 32px 0;
+  }
+  .scope {
+    background: #000;
+    padding: 20px;
+    aspect-ratio: 1.3/1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .scope__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #666;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #222;
+  }
+  .scope__header strong { color: var(--amber); font-weight: 500; }
+  .scope__body {
+    flex: 1;
+    position: relative;
+  }
+  .scope__body svg { width: 100%; height: 100%; display: block; }
+  .scope__caption {
+    font-family: var(--body);
+    font-size: 13px;
+    color: var(--ink-dim);
+    line-height: 1.5;
+    padding: 18px 20px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--rule);
+  }
+  .scope__caption strong { color: var(--ink); }
+  @media (max-width: 720px) { .scope-grid { grid-template-columns: 1fr; } }
 
-    .top-bar__tag {
-      font-family: var(--mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--text-dim);
-      background: var(--bg-card);
-      border: 0.5px solid var(--border);
-      padding: 3px 8px;
-      border-radius: 4px;
-    }
+  /* Step flow */
+  .steps { margin: 40px 0; counter-reset: step; }
+  .step {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 32px;
+    padding: 32px 0;
+    border-top: 1px solid var(--rule);
+    counter-increment: step;
+  }
+  .step:last-child { border-bottom: 1px solid var(--rule); }
+  .step__num {
+    font-family: var(--display);
+    font-size: 56px;
+    font-weight: 300;
+    font-style: italic;
+    font-variation-settings: "opsz" 144;
+    color: var(--amber);
+    line-height: 0.9;
+    opacity: 0.7;
+  }
+  .step__num::before { content: counter(step, decimal-leading-zero); }
+  .step__body h4 {
+    font-family: var(--display);
+    font-size: 24px;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .step__body p { color: var(--ink-dim); font-size: 15px; line-height: 1.6; }
+  .step__tool {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: var(--bg-3);
+    color: var(--teal);
+    border-radius: 2px;
+  }
+  @media (max-width: 720px) {
+    .step { grid-template-columns: 1fr; gap: 12px; }
+    .step__num { font-size: 42px; }
+  }
 
-    .article-header {
-      margin-bottom: 48px;
-    }
+  /* Color theory looks */
+  .looks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .look {
+    padding: 24px;
+    border-radius: 2px;
+    aspect-ratio: 4/5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .look::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.9;
+  }
+  .look > * { position: relative; z-index: 1; }
+  .look__name {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 500;
+    font-style: italic;
+    color: #fff;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .look__desc {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.5;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.4);
+  }
+  .look__kind {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: auto;
+  }
 
-    .article-eyebrow {
-      font-family: var(--mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
+  .look--teal-orange::before { background: linear-gradient(135deg, #0a3a4a 0%, #1a5f6f 40%, #d17435 85%); }
+  .look--warm::before { background: linear-gradient(135deg, #3b1e0a 0%, #a5621a 50%, #e8a04d 100%); }
+  .look--cold::before { background: linear-gradient(135deg, #0c1a3a 0%, #254676 60%, #5b8fce 100%); }
+  .look--bleach::before { background: linear-gradient(135deg, #2e2e2e 0%, #6b6a62 50%, #b8b0a0 100%); }
+  .look--matrix::before { background: linear-gradient(135deg, #0a1a0a 0%, #1e3a22 50%, #5a7840 100%); }
+  .look--pastel::before { background: linear-gradient(135deg, #d7a5b8 0%, #e8c8a8 50%, #a8c8d8 100%); }
 
-    .article-title {
-      font-family: var(--serif);
-      font-size: clamp(32px, 7vw, 52px);
-      font-weight: 500;
-      font-style: normal;
-      line-height: 1.1;
-      color: var(--text);
-      margin-bottom: 20px;
-      letter-spacing: -0.02em;
-    }
+  /* Tips callout */
+  .tip {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    padding: 24px 28px;
+    background: var(--bg-card);
+    border-left: 2px solid var(--teal);
+    margin: 32px 0;
+  }
+  .tip__icon {
+    font-family: var(--display);
+    font-size: 40px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--teal);
+    line-height: 1;
+  }
+  .tip h5 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .tip p { font-size: 14px; color: var(--ink-dim); }
 
-    .article-intro {
-      font-family: var(--serif);
-      font-size: 18px;
-      font-style: italic;
-      font-weight: 400;
-      color: var(--text-soft);
-      line-height: 1.65;
-      max-width: 560px;
-    }
+  /* Warning callout */
+  .warn {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    padding: 24px 28px;
+    background: var(--bg-card);
+    border-left: 2px solid var(--crimson);
+    margin: 32px 0;
+  }
+  .warn__icon {
+    font-family: var(--display);
+    font-size: 40px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--crimson);
+    line-height: 1;
+  }
+  .warn h5 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .warn p { font-size: 14px; color: var(--ink-dim); }
 
-    /* Módulos */
-    .module-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
+  /* Before/after slider */
+  .ba {
+    margin: 40px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    padding: 24px;
+  }
+  .ba__label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 16px;
+  }
+  .ba__container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: 2px;
+    cursor: ew-resize;
+    user-select: none;
+  }
+  .ba__img {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 40px;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+  .ba__before { background: linear-gradient(135deg, #4a4842 0%, #6b6960 50%, #8a8880 100%); }
+  .ba__after {
+    background: linear-gradient(135deg, #0a3a4a 0%, #1a5f6f 40%, #d17435 90%);
+    clip-path: inset(0 0 0 50%);
+  }
+  .ba__handle {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: #fff;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .ba__handle::before {
+    content: '⟷';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    color: #000;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .ba__tag {
+    position: absolute;
+    top: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .ba__tag--before { left: 16px; }
+  .ba__tag--after { right: 16px; }
 
-    .module {
-      border-top: 0.5px solid var(--border);
-      padding: 24px 0;
-    }
+  /* Color wheel */
+  .wheel-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    margin: 40px 0;
+  }
+  .wheel-section p { margin-bottom: 16px; color: var(--ink-soft); font-size: 15px; }
+  @media (max-width: 720px) { .wheel-section { grid-template-columns: 1fr; } }
 
-    .module:last-child {
-      border-bottom: 0.5px solid var(--border);
-    }
+  .wheel {
+    aspect-ratio: 1;
+    position: relative;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+  .wheel svg { width: 100%; height: 100%; display: block; }
 
-    .module__header {
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-      margin-bottom: 12px;
-    }
+  /* Software stack */
+  .software {
+    margin: 40px 0;
+    border: 1px solid var(--rule);
+  }
+  .sw-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 140px;
+    gap: 32px;
+    padding: 24px 28px;
+    align-items: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sw-row:last-child { border-bottom: none; }
+  .sw-row h5 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 500;
+    font-style: italic;
+  }
+  .sw-row p { font-size: 14px; color: var(--ink-dim); line-height: 1.5; }
+  .sw-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    text-align: center;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .sw-badge--king { background: rgba(255, 140, 66, 0.15); color: var(--orange); border: 1px solid rgba(255,140,66,0.4); }
+  .sw-badge--pro { background: rgba(56, 189, 248, 0.12); color: var(--cyan); border: 1px solid rgba(56,189,248,0.3); }
+  .sw-badge--free { background: rgba(163, 230, 53, 0.12); color: var(--lime); border: 1px solid rgba(163,230,53,0.3); }
+  .sw-badge--plugin { background: rgba(232, 121, 249, 0.12); color: var(--magenta); border: 1px solid rgba(232,121,249,0.3); }
+  @media (max-width: 720px) {
+    .sw-row { grid-template-columns: 1fr; gap: 10px; }
+    .sw-badge { justify-self: start; }
+  }
 
-    .module__num {
-      font-family: var(--mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--text-dim);
-      flex-shrink: 0;
-      min-width: 28px;
-    }
+  /* Glossary */
+  .glossary {
+    columns: 2;
+    column-gap: 40px;
+    margin: 40px 0;
+  }
+  .glossary > div {
+    break-inside: avoid;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .glossary dt {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--amber);
+    margin-bottom: 4px;
+  }
+  .glossary dd {
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height: 1.55;
+  }
+  @media (max-width: 720px) { .glossary { columns: 1; } }
 
-    .module__title {
-      font-family: var(--serif);
-      font-size: 20px;
-      font-weight: 500;
-      color: var(--text);
-      line-height: 1.3;
-    }
+  /* Outro */
+  .outro {
+    padding: 140px 0;
+    text-align: center;
+    border-top: 1px solid var(--rule);
+  }
+  .outro h2 {
+    font-family: var(--display);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+    font-variation-settings: "opsz" 144;
+  }
+  .outro h2 em {
+    font-style: normal;
+    font-weight: 500;
+    background: linear-gradient(92deg, var(--orange), var(--amber), var(--teal));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .outro p {
+    max-width: 560px;
+    margin: 0 auto;
+    color: var(--ink-dim);
+    font-size: 17px;
+  }
+  .outro__sig {
+    margin-top: 64px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
 
-    .module__body {
-      padding-left: 44px;
-    }
+  /* Selection */
+  ::selection { background: var(--amber); color: #000; }
 
-    .module__desc {
-      font-size: 15px;
-      color: var(--text-soft);
-      line-height: 1.65;
-      margin-bottom: 12px;
-    }
-
-    .module__topics {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .module__topics li {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--text-dim);
-      padding-left: 16px;
-      position: relative;
-      line-height: 1.5;
-    }
-
-    .module__topics li::before {
-      content: '·';
-      position: absolute;
-      left: 0;
-      color: var(--accent);
-    }
-
-    .module__highlight {
-      display: inline;
-      color: var(--accent);
-      font-style: normal;
-    }
-
-    .section-divider {
-      margin: 48px 0 40px;
-      border: none;
-      border-top: 0.5px solid var(--border);
-    }
-
-    .footer {
-      margin-top: 64px;
-      padding-top: 24px;
-      border-top: 0.5px solid var(--border);
-      font-family: var(--mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--text-dim);
-    }
-
-    @media (min-width: 768px) {
-      .wrap { padding: 40px 48px 80px; }
-    }
-  </style>
+  /* Keyboard shortcut table */
+  .shortcuts {
+    margin: 32px 0;
+    border: 1px solid var(--rule);
+  }
+  .shortcut {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--rule);
+    align-items: center;
+    gap: 20px;
+  }
+  .shortcut:last-child { border-bottom: none; }
+  .shortcut kbd {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--bg-3);
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    color: var(--amber);
+    display: inline-block;
+  }
+  .shortcut span { font-size: 14px; color: var(--ink-dim); }
+</style>
 </head>
 <body>
 
-<div class="wrap">
+<div class="progress"><div class="progress__bar" id="bar"></div></div>
 
-  <div class="top-bar">
-    <a href="../conocimiento/" class="return-link">← jorge-malgesto / conocimiento</a>
-    <span class="top-bar__tag">Visual y técnica · J</span>
+<!-- ============================== HERO ============================== -->
+<section class="hero">
+  <div class="hero__blobs">
+    <div class="blob blob--1"></div>
+    <div class="blob blob--2"></div>
+    <div class="blob blob--3"></div>
   </div>
-
-  <header class="article-header">
-    <p class="article-eyebrow">Corrección de color</p>
-    <h1 class="article-title">Una clase completa.</h1>
-    <p class="article-intro">
-      Todo lo que necesitás saber para controlar el color en post-producción:
-      desde los fundamentos del ojo humano hasta el pipeline técnico de una entrega profesional.
-      Once módulos. Sin atajos.
+  <div class="shell">
+    <div class="hero__eyebrow">Clase maestra · 10 módulos · Para principiantes</div>
+    <h1>Corrección<br>de <em>color</em>.</h1>
+    <p class="hero__lead">
+      El arte invisible de pintar con luz. Por qué tu amiga graba "descolorido" a propósito, cómo los scopes son más honestos que tus ojos, y por qué el look naranja-teal se comió al cine de Hollywood.
     </p>
-  </header>
+    <div class="hero__meta">
+      <div><span>Nivel</span><strong>Principiante → Intermedio</strong></div>
+      <div><span>Duración estimada</span><strong>45–60 min de lectura</strong></div>
+      <div><span>Software de ejemplo</span><strong>DaVinci Resolve</strong></div>
+      <div><span>Idioma</span><strong>Español (México)</strong></div>
+    </div>
+  </div>
+</section>
 
-  <hr class="section-divider">
+<!-- ============================== TOC ============================== -->
+<section class="toc">
+  <div class="shell">
+    <div class="toc__title">Índice / Lo que vas a aprender</div>
+    <ul class="toc__list">
+      <li><a href="#m1"><span class="num">01</span><span class="label">Corrección vs. Color Grading</span></a></li>
+      <li><a href="#m2"><span class="num">02</span><span class="label">Por qué se graba "en crudo"</span></a></li>
+      <li><a href="#m3"><span class="num">03</span><span class="label">Vocabulario esencial</span></a></li>
+      <li><a href="#m4"><span class="num">04</span><span class="label">Los scopes (confía en las gráficas)</span></a></li>
+      <li><a href="#m5"><span class="num">05</span><span class="label">Corrección primaria, paso a paso</span></a></li>
+      <li><a href="#m6"><span class="num">06</span><span class="label">Corrección secundaria</span></a></li>
+      <li><a href="#m7"><span class="num">07</span><span class="label">El look: teoría de color en cine</span></a></li>
+      <li><a href="#m8"><span class="num">08</span><span class="label">Software y herramientas</span></a></li>
+      <li><a href="#m9"><span class="num">09</span><span class="label">Flujo de trabajo completo</span></a></li>
+      <li><a href="#m10"><span class="num">10</span><span class="label">Tips de oro + Glosario</span></a></li>
+    </ul>
+  </div>
+</section>
 
-  <div class="module-list">
-
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">01</span>
-        <h2 class="module__title">El ojo y la cámara</h2>
+<!-- ============================== MODULE 1 ============================== -->
+<section class="module" id="m1">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 01</div>
+      <div>
+        <div class="module__kicker">Los dos oficios detrás de una palabra</div>
+        <h2 class="module__title">No es lo mismo <em>corregir</em> que <em>calificar</em> color.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          Por qué la cámara no ve como el ojo. Rango dinámico, temperatura de color,
-          metamerismo y por qué lo que ves en el monitor <em class="module__highlight">nunca es lo que grabaste</em>.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          Cuando tu amiga te dijo "lo coloreo después", en realidad estaba hablando de dos cosas distintas que en la industria se dividen en pasos separados: <strong>color correction</strong> y <strong>color grading</strong>. Entenderlas por separado es el paso uno.
         </p>
-        <ul class="module__topics">
-          <li>Rango dinámico humano vs. sensor</li>
-          <li>Color primario, complementario y la rueda de color</li>
-          <li>Temperatura de color y el eje naranja-azul</li>
-          <li>Metamerismo: mismo color, distinta fuente</li>
-        </ul>
+
+        <div class="compare">
+          <div>
+            <div class="compare__tag">→ Primera etapa</div>
+            <h4>Color Correction</h4>
+            <p>Técnica. Reparadora. Objetiva. Es la que arregla: que la imagen no se vea azulosa por la luz del foco, que los blancos sean blancos, que la exposición no reviente las altas luces, que tomas de la misma escena se parezcan entre sí.</p>
+            <div class="compare__goal">OBJETIVO: Que se vea <strong>correcto</strong></div>
+          </div>
+          <div>
+            <div class="compare__tag">→ Segunda etapa</div>
+            <h4>Color Grading</h4>
+            <p>Creativa. Narrativa. Subjetiva. Aquí le pones "personalidad": cálido y nostálgico, frío y distante, contrastado y cinematográfico, pastel y ligero. El look que hace que una escena <em>sienta</em> antes de que la pienses.</p>
+            <div class="compare__goal">OBJETIVO: Que se sienta <strong>algo</strong></div>
+          </div>
+        </div>
+
+        <p>
+          En conversación cotidiana todo mundo (incluida tu amiga) dice "corrección de color" para referirse a las dos, y está bien. Pero saber la distinción te ayuda a pensar el trabajo en orden: <strong>primero corriges, después calificas</strong>. Si le metes un look cinematográfico a una toma mal expuesta, multiplicas el problema en vez de resolverlo.
+        </p>
+
+        <div class="pull">
+          "Color correction is a science. Color grading is an art."
+          <span>— Frase clásica entre coloristas</span>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">02</span>
-        <h2 class="module__title">Espacios de color y codecs</h2>
+<!-- ============================== MODULE 2 ============================== -->
+<section class="module" id="m2">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 02</div>
+      <div>
+        <div class="module__kicker">El misterio del video "descolorido"</div>
+        <h2 class="module__title">Por qué grabar en <em>crudo</em> (o en <em>LOG</em>) es una genialidad, no un error.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          Rec.709, Rec.2020, DCI-P3, sRGB. Qué es un espacio de color,
-          qué significa que un codec sea 4:2:0 y por qué el 10-bit
-          <em class="module__highlight">cambia todo</em> cuando empezás a gradearlo.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          Cuando tu amiga te mostró el material "sin color" y se veía lavado, gris, descafeinado, no estaba roto. Estaba grabado en un formato que preserva la <strong>mayor cantidad de información posible</strong> para que ella pueda decidir el look después. Hay dos sabores principales:
         </p>
-        <ul class="module__topics">
-          <li>Bit depth y banding</li>
-          <li>Chroma subsampling 4:4:4 / 4:2:2 / 4:2:0</li>
-          <li>LUT de transformación vs. LUT de look</li>
-          <li>Gamut, primaries y white point</li>
-        </ul>
+
+        <h3>RAW vs. LOG vs. Rec.709</h3>
+
+        <div class="log-demo">
+          <div class="log-demo__row">
+            <div class="log-demo__label"><strong>Rec.709</strong>Listo para ver</div>
+            <div class="log-strip">
+              <span style="background:#0a0a0a"></span>
+              <span style="background:#1a1a1a"></span>
+              <span style="background:#3a3a3a"></span>
+              <span style="background:#7a7a7a"></span>
+              <span style="background:#b5b5b5"></span>
+              <span style="background:#e0e0e0"></span>
+              <span style="background:#ffffff"></span>
+            </div>
+          </div>
+          <div class="log-demo__row">
+            <div class="log-demo__label"><strong>LOG</strong>Plano, para editar</div>
+            <div class="log-strip">
+              <span style="background:#2a2a28"></span>
+              <span style="background:#3a3a36"></span>
+              <span style="background:#4a4a45"></span>
+              <span style="background:#6a6a63"></span>
+              <span style="background:#8b8b82"></span>
+              <span style="background:#a5a59a"></span>
+              <span style="background:#bdbdb0"></span>
+            </div>
+          </div>
+          <div class="log-demo__row">
+            <div class="log-demo__label"><strong>RAW</strong>Datos del sensor</div>
+            <div class="log-strip">
+              <span style="background:#3b3832"></span>
+              <span style="background:#4a4740"></span>
+              <span style="background:#5a564d"></span>
+              <span style="background:#6e695e"></span>
+              <span style="background:#85806f"></span>
+              <span style="background:#a09a87"></span>
+              <span style="background:#b9b3a0"></span>
+            </div>
+          </div>
+        </div>
+
+        <h4>Rec.709</h4>
+        <p>Es el estándar "listo para ver" en televisiones y celulares. Negros negros, blancos blancos, colores saturados. Lo bueno: se ve rico desde la cámara. Lo malo: si grabas así, la cámara <em>ya tomó decisiones</em> por ti. Si el cielo quedó quemado, ya no lo recuperas.</p>
+
+        <h4>LOG (S-Log, C-Log, V-Log, HLG, etc.)</h4>
+        <p>Es una curva logarítmica. Comprime la información para que tanto los detalles en la sombra como en las altas luces quepan en el archivo. Se ve descolorido <strong>a propósito</strong>. Es como grabar en "modo flexible": tú decidirás después dónde van los negros, los blancos, la saturación. Cada marca de cámara tiene el suyo: Sony usa S-Log3, Canon usa C-Log3, Panasonic usa V-Log, DJI tiene D-Log.</p>
+
+        <h4>RAW</h4>
+        <p>Los datos del sensor <em>sin procesar</em>. La máxima flexibilidad (puedes incluso cambiar el balance de blancos después de grabar, como si nada). También los archivos más pesados y las cámaras más caras. Es el material que quiere un cine feature o un comercial high-end.</p>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>Rango dinámico: la palabra clave</h5>
+            <p>Es la distancia entre la parte más oscura y la más brillante que la cámara puede capturar. Se mide en <em>stops</em>. Una buena cámara LOG captura 13–15 stops. Tu celular en auto captura 8–10. Más stops = más libertad después.</p>
+          </div>
+        </div>
+
+        <p>
+          Así que cuando tu amiga graba "en crudo", está siendo profesional: sacrifica el "se ve bonito desde la cámara" a cambio de poder esculpir la imagen a su gusto en la postproducción. Es la diferencia entre pintar sobre un lienzo en blanco y pintar sobre un poster que ya venía impreso.
+        </p>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">03</span>
-        <h2 class="module__title">Log y curvas de transferencia</h2>
+<!-- ============================== MODULE 3 ============================== -->
+<section class="module" id="m3">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 03</div>
+      <div>
+        <div class="module__kicker">El idioma del color</div>
+        <h2 class="module__title">Vocabulario que tienes que <em>saber</em> antes de tocar un solo control.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          S-Log, Log-C, V-Log, C-Log. Todas hacen lo mismo de formas distintas.
-          Entender la gamma te libera de depender de los presets del fabricante.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          Cada panel de corrección está lleno de palabras que suenan técnicas pero se refieren a conceptos intuitivos. Aquí las 10 que necesitas para el 90% del trabajo.
         </p>
-        <ul class="module__topics">
-          <li>Qué es una curva de transferencia (OETF / EOTF)</li>
-          <li>Por qué el log se ve "lavado" recto de cámara</li>
-          <li>IDT / ODT en el pipeline ACES</li>
-          <li>Cómo elegir el punto de exposición correcto en log</li>
-        </ul>
+
+        <div class="cards">
+          <div class="card">
+            <div class="card__label">#01</div>
+            <h5>Exposición</h5>
+            <p>Qué tan brillante está la imagen en general. Si tu clip está subexpuesto (oscuro) o sobreexpuesto (reventado), este es el primer control que tocas.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#02</div>
+            <h5>Balance de blancos</h5>
+            <p>Indica qué color es "blanco" para el ojo. Una foto con tungsteno sin corregir sale anaranjada; con luz día sin corregir, azulosa. Se corrige aquí.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#03</div>
+            <h5>Temperatura</h5>
+            <p>Cálido (amarillo/naranja) ←→ Frío (azul). Se mide en Kelvin. 3200K = tungsteno, 5600K = luz día, 6500K+ = nublado / sombra.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#04</div>
+            <h5>Tinte (tint)</h5>
+            <p>El otro eje: verde ←→ magenta. Corrige cuando el balance falla por fluorescentes (verdosos) o LEDs baratos.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#05</div>
+            <h5>Contraste</h5>
+            <p>La diferencia entre lo más claro y lo más oscuro. Alto = dramático, duro. Bajo = suave, lavado.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#06</div>
+            <h5>Saturación</h5>
+            <p>Qué tan "coloridos" son los colores. Saturación 0 = blanco y negro. Saturación alta = telenovela brasileña.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#07</div>
+            <h5>Vibrancia</h5>
+            <p>Parecida a saturación pero más inteligente: sube colores que están poco saturados y respeta los tonos de piel. Úsala.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#08</div>
+            <h5>Sombras / Medios / Altas luces</h5>
+            <p>Las tres zonas de luminancia. Corresponden a Lift / Gamma / Gain en los paneles profesionales. Separarlas es clave.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#09</div>
+            <h5>Luminancia</h5>
+            <p>La información de <em>brillo</em>, sin color. Es la capa en blanco y negro de la imagen.</p>
+          </div>
+          <div class="card">
+            <div class="card__label">#10</div>
+            <h5>Crominancia</h5>
+            <p>La información de <em>color</em>, separada del brillo. Cuando trabajas con balance de blancos, estás tocando esto.</p>
+          </div>
+        </div>
+
+        <p>
+          Una imagen digital, en el fondo, se puede descomponer en estas dos capas: una en blanco y negro (luminancia) y una de puro color (crominancia). Muchísimas decisiones de corrección se vuelven más fáciles cuando aprendes a pensar así.
+        </p>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">04</span>
-        <h2 class="module__title">Los scopes</h2>
+<!-- ============================== MODULE 4 ============================== -->
+<section class="module" id="m4">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 04</div>
+      <div>
+        <div class="module__kicker">Las gráficas que no mienten</div>
+        <h2 class="module__title">Los <em>scopes</em>: herramientas que ven lo que tus ojos no pueden.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          Waveform, vectorscópio, parade y histogram.
-          <em class="module__highlight">No grades con los ojos solos.</em>
-          Los scopes no mienten aunque el monitor sí pueda hacerlo.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          Regla de oro de un colorista: <strong>no confíes en tu monitor, confía en los scopes.</strong> Tus ojos se cansan, se adaptan, te mienten. Los scopes son gráficas objetivas de lo que está pasando en la imagen. Hay cuatro que tienes que conocer.
         </p>
-        <ul class="module__topics">
-          <li>Leer el waveform para exposición y contraste</li>
-          <li>El vectorscopio y la saturación legal</li>
-          <li>Parade RGB para balance de color</li>
-          <li>Calibración de monitor con sonda</li>
-        </ul>
+
+        <div class="scope-grid full">
+          <!-- Waveform -->
+          <div class="scope">
+            <div class="scope__header"><strong>Waveform</strong><span>LUMA · 0–100 IRE</span></div>
+            <div class="scope__body">
+              <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="wf" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+                    <stop offset="0.1" stop-color="#fff" stop-opacity="0.9"/>
+                    <stop offset="0.9" stop-color="#fff" stop-opacity="0.9"/>
+                    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <!-- grid -->
+                <g stroke="#222" stroke-width="0.5">
+                  <line x1="0" y1="18" x2="300" y2="18"/>
+                  <line x1="0" y1="60" x2="300" y2="60"/>
+                  <line x1="0" y1="108" x2="300" y2="108"/>
+                  <line x1="0" y1="160" x2="300" y2="160"/>
+                </g>
+                <g fill="#444" font-family="monospace" font-size="8">
+                  <text x="4" y="16">100</text>
+                  <text x="4" y="58">75</text>
+                  <text x="4" y="106">50</text>
+                  <text x="4" y="158">0</text>
+                </g>
+                <!-- waveform trace -->
+                <path d="M20,160 Q40,120 60,80 T100,60 T140,40 T180,30 T220,45 T260,90 T290,140 L290,160 Z" fill="url(#wf)" opacity="0.8"/>
+                <path d="M20,155 Q40,130 60,100 T100,75 T140,55 T180,50 T220,65 T260,105 T290,150" fill="none" stroke="#8fc" stroke-width="1" opacity="0.9"/>
+              </svg>
+            </div>
+            <div class="scope__caption">
+              <strong>Qué mide:</strong> luminancia (brillo) por posición horizontal del frame. El piso es 0 (negro puro) y el techo 100 IRE (blanco puro). <strong>Para qué:</strong> exposición y contraste. Los negros deben tocar el piso, los blancos aproximarse al techo sin clipear.
+            </div>
+          </div>
+          <!-- Vectorscope -->
+          <div class="scope">
+            <div class="scope__header"><strong>Vectorscope</strong><span>HUE · SAT</span></div>
+            <div class="scope__body">
+              <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+                <!-- outer circle -->
+                <circle cx="90" cy="90" r="80" fill="none" stroke="#333" stroke-width="1"/>
+                <circle cx="90" cy="90" r="55" fill="none" stroke="#222" stroke-width="0.5"/>
+                <circle cx="90" cy="90" r="30" fill="none" stroke="#222" stroke-width="0.5"/>
+                <!-- color targets -->
+                <g font-family="monospace" font-size="7">
+                  <circle cx="140" cy="60" r="4" fill="#ef4444" opacity="0.6"/><text x="148" y="62" fill="#666">R</text>
+                  <circle cx="50" cy="120" r="4" fill="#2dd4bf" opacity="0.6"/><text x="36" y="122" fill="#666">Cy</text>
+                  <circle cx="145" cy="115" r="4" fill="#facc15" opacity="0.6"/><text x="153" y="118" fill="#666">Y</text>
+                  <circle cx="45" cy="70" r="4" fill="#3b82f6" opacity="0.6"/><text x="32" y="68" fill="#666">B</text>
+                  <circle cx="85" cy="150" r="4" fill="#a3e635" opacity="0.6"/><text x="92" y="156" fill="#666">G</text>
+                  <circle cx="105" cy="35" r="4" fill="#e879f9" opacity="0.6"/><text x="112" y="32" fill="#666">M</text>
+                </g>
+                <!-- skin tone line (11 o'clock) -->
+                <line x1="90" y1="90" x2="132" y2="54" stroke="#ffbd59" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.6"/>
+                <!-- data blob -->
+                <ellipse cx="112" cy="72" rx="18" ry="22" fill="#ffbd59" opacity="0.35" transform="rotate(-30 112 72)"/>
+                <ellipse cx="108" cy="76" rx="10" ry="14" fill="#ff8c42" opacity="0.6" transform="rotate(-30 108 76)"/>
+                <!-- center -->
+                <circle cx="90" cy="90" r="2" fill="#fff"/>
+              </svg>
+            </div>
+            <div class="scope__caption">
+              <strong>Qué mide:</strong> tono (ángulo) y saturación (distancia al centro). <strong>Para qué:</strong> ver qué colores dominan y balancearlos. La <em>línea de piel</em> (entre rojo y amarillo, ~11 en punto) es la regla de oro para tonos de piel naturales.
+            </div>
+          </div>
+          <!-- RGB Parade -->
+          <div class="scope">
+            <div class="scope__header"><strong>RGB Parade</strong><span>R · G · B</span></div>
+            <div class="scope__body">
+              <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+                <!-- grid -->
+                <g stroke="#222" stroke-width="0.5">
+                  <line x1="0" y1="18" x2="300" y2="18"/>
+                  <line x1="0" y1="160" x2="300" y2="160"/>
+                </g>
+                <!-- dividers -->
+                <line x1="100" y1="0" x2="100" y2="180" stroke="#111" stroke-width="0.5"/>
+                <line x1="200" y1="0" x2="200" y2="180" stroke="#111" stroke-width="0.5"/>
+                <!-- R -->
+                <path d="M10,160 Q30,100 55,70 Q75,55 95,90 L95,160 Z" fill="#ef4444" opacity="0.45"/>
+                <!-- G -->
+                <path d="M110,160 Q130,120 155,85 Q175,70 195,115 L195,160 Z" fill="#a3e635" opacity="0.45"/>
+                <!-- B -->
+                <path d="M210,160 Q230,130 255,100 Q275,85 295,125 L295,160 Z" fill="#38bdf8" opacity="0.45"/>
+                <g font-family="monospace" font-size="9" fill="#888">
+                  <text x="48" y="175">R</text>
+                  <text x="148" y="175">G</text>
+                  <text x="248" y="175">B</text>
+                </g>
+              </svg>
+            </div>
+            <div class="scope__caption">
+              <strong>Qué mide:</strong> los tres canales (rojo, verde, azul) como waveforms separados. <strong>Para qué:</strong> balance de blancos. En una imagen neutra, los tres canales deben estar alineados en altura en las zonas grises.
+            </div>
+          </div>
+          <!-- Histogram -->
+          <div class="scope">
+            <div class="scope__header"><strong>Histograma</strong><span>DISTRIBUCIÓN</span></div>
+            <div class="scope__body">
+              <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+                <line x1="0" y1="160" x2="300" y2="160" stroke="#333" stroke-width="0.5"/>
+                <path d="M10,160 Q30,150 55,100 Q80,60 110,55 Q140,52 170,75 Q200,110 230,130 Q260,145 290,158 L290,160 L10,160 Z" fill="#fff" opacity="0.15"/>
+                <path d="M10,160 Q30,150 55,100 Q80,60 110,55 Q140,52 170,75 Q200,110 230,130 Q260,145 290,158" fill="none" stroke="#fff" stroke-width="1.2" opacity="0.9"/>
+                <g font-family="monospace" font-size="9" fill="#666">
+                  <text x="10" y="175">Sombras</text>
+                  <text x="130" y="175">Medios</text>
+                  <text x="240" y="175">Altas</text>
+                </g>
+              </svg>
+            </div>
+            <div class="scope__caption">
+              <strong>Qué mide:</strong> cuántos pixeles hay en cada nivel de brillo. <strong>Para qué:</strong> ver si la imagen está cargada a sombras, a medios o a altas. Un histograma "pegado" a la izquierda = subexpuesta. Pegado a la derecha = sobreexpuesta.
+            </div>
+          </div>
+        </div>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>La regla de los scopes</h5>
+            <p>Ponlos los cuatro visibles en una segunda pantalla mientras corriges. El waveform te dice cómo está la luz, el parade cómo está el balance, el vectorscope cómo está el color y el histograma te da el panorama general.</p>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">05</span>
-        <h2 class="module__title">Balance primario</h2>
+<!-- ============================== MODULE 5 ============================== -->
+<section class="module" id="m5">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 05</div>
+      <div>
+        <div class="module__kicker">Corrección primaria</div>
+        <h2 class="module__title">El <em>orden</em> importa más que las herramientas.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          Lift, gamma, gain. Las ruedas de color como herramienta quirúrgica.
-          Cómo establecer el negro, el blanco y el gris medio antes de
-          tocar cualquier otra cosa.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          La corrección primaria es la que afecta <strong>toda la imagen</strong>. Aquí arreglas los problemas antes de ponerle "personalidad". Si sigues este orden, el 80% de tu material va a quedar decente sin tocar nada más.
         </p>
-        <ul class="module__topics">
-          <li>Orden de operaciones: por qué primero el balance</li>
-          <li>Neutralizar el cast sin destruir la intención</li>
-          <li>Log wheel vs. offset wheel vs. linear wheel</li>
-          <li>El método de los grises neutros</li>
-        </ul>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Exposición y niveles</h4>
+              <p>Lleva los negros al piso del waveform (~0) y las altas luces cerca del techo (~95–100) sin que se claveen. Esto te da rango completo. En LOG vas a ganar un montón de contraste de golpe y de repente empieza a verse como un video normal.</p>
+              <div class="step__tool">Herramienta: Lift/Offset + Gain</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Balance de blancos</h4>
+              <p>Usa el RGB Parade. Busca una zona neutra en la imagen (una camisa gris, papel, una pared blanca) y ajusta temperatura/tinte hasta que los tres canales estén a la misma altura en esa zona.</p>
+              <div class="step__tool">Herramienta: Temp + Tint · Gotero</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Contraste</h4>
+              <p>Una leve curva en "S" en el panel de curvas: baja un poquito las sombras, sube un poquito las altas. Le regresa la vida a imágenes lavadas de LOG. No te pases o vas a perder textura en la cara.</p>
+              <div class="step__tool">Herramienta: Curves · Contrast</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Saturación</h4>
+              <p>LOG desatura mucho. Sube saturación hasta que los colores se vean naturales, no estridentes. Si puedes, usa vibrancia en vez de saturación pura: protege tonos de piel.</p>
+              <div class="step__tool">Herramienta: Saturation · Vibrance</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Matching entre tomas</h4>
+              <p>Si tu escena tiene 3 cámaras, 6 tomas, una al amanecer y otra nublada, todas deben <em>parecer la misma escena</em>. Usa una toma de referencia y ajusta las demás hasta que sus scopes coincidan. Esto es 50% del trabajo real de un colorista.</p>
+              <div class="step__tool">Herramienta: Still grabs · Shot match</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Las herramientas que aparecen siempre</h3>
+
+        <div class="wheel-section full">
+          <div>
+            <h4>Las tres ruedas de color</h4>
+            <p>La interfaz clásica del colorista son tres ruedas: <strong>Lift</strong> (sombras), <strong>Gamma</strong> (medios tonos) y <strong>Gain</strong> (altas luces). Cada una tiene un disco de color y una perilla de luminancia.</p>
+            <p>Si quieres que las sombras sean más frías y las altas más cálidas (la base del look "teal & orange"), jalas Lift hacia cian y Gain hacia amarillo. Es literalmente <em>pintar</em> por zonas tonales.</p>
+            <p>Es más intuitivo de lo que suena: es como tener tres pinceles, uno para las zonas oscuras, uno para los medios y uno para las brillantes.</p>
+          </div>
+          <div class="wheel">
+            <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="cw" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0" stop-color="#fff" stop-opacity="0.05"/>
+                  <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <!-- 12 color segments -->
+              <g transform="translate(150 150)">
+                <g id="seg">
+                  <path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#ef4444"/>
+                </g>
+                <use href="#seg" transform="rotate(30)" fill-opacity="1" style="fill:#f97316"/>
+                <g transform="rotate(30)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#f97316"/></g>
+                <g transform="rotate(60)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#facc15"/></g>
+                <g transform="rotate(90)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#a3e635"/></g>
+                <g transform="rotate(120)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#22c55e"/></g>
+                <g transform="rotate(150)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#2dd4bf"/></g>
+                <g transform="rotate(180)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#38bdf8"/></g>
+                <g transform="rotate(210)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#3b82f6"/></g>
+                <g transform="rotate(240)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#6366f1"/></g>
+                <g transform="rotate(270)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#a855f7"/></g>
+                <g transform="rotate(300)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#e879f9"/></g>
+                <g transform="rotate(330)"><path d="M 0,0 L 120,0 A 120,120 0 0,1 103.92,60 Z" fill="#ec4899"/></g>
+                <!-- center circle -->
+                <circle cx="0" cy="0" r="30" fill="#0a0a0d"/>
+                <circle cx="0" cy="0" r="30" fill="url(#cw)"/>
+                <circle cx="0" cy="0" r="30" fill="none" stroke="#f4eee3" stroke-width="1" opacity="0.3"/>
+                <!-- puck -->
+                <circle cx="38" cy="-22" r="6" fill="#f4eee3" stroke="#0a0a0d" stroke-width="1.5"/>
+                <line x1="0" y1="0" x2="38" y2="-22" stroke="#f4eee3" stroke-width="1" opacity="0.5"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <h4>Curvas RGB</h4>
+        <p>La herramienta más poderosa del kit. Puedes curvear la luminancia (todos los canales juntos) o cada canal por separado (R, G, B). Una curva en "S" suma contraste. Jalar el canal rojo arriba en las altas y abajo en las sombras crea el famoso warm highlights, cold shadows.</p>
+
+        <h4>Panel tonal / HSL</h4>
+        <p>Te deja separar la imagen por tono (hue), saturación y luminancia. Útil para bajar la saturación del verde del pasto sin tocar la piel, por ejemplo.</p>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">06</span>
-        <h2 class="module__title">Curvas y contraste</h2>
+<!-- ============================== MODULE 6 ============================== -->
+<section class="module" id="m6">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 06</div>
+      <div>
+        <div class="module__kicker">Cirugía fina</div>
+        <h2 class="module__title">Corrección <em>secundaria</em>: cuando solo quieres cambiar una parte.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          La curva custom como extensión de las ruedas. Cómo construir
-          un contraste que se siente <em class="module__highlight">orgánico</em> y no aplastado.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          La corrección primaria afecta todo. La secundaria afecta <strong>solo un pedacito</strong>: un cielo, una cara, una playera roja. Es donde el trabajo se vuelve quirúrgico (y donde el software profesional le saca ventaja al básico).
         </p>
-        <ul class="module__topics">
-          <li>S-curve y su efecto en la percepción de contraste</li>
-          <li>Curvas por canal (R, G, B independientes)</li>
-          <li>Curva Hue vs. Sat / Hue vs. Hue / Lum vs. Sat</li>
-          <li>Cuando la curva mata el detalle en las sombras</li>
-        </ul>
+
+        <h3>Las tres formas de aislar algo</h3>
+
+        <h4>1. Qualifiers (selección por color)</h4>
+        <p>Con un gotero eliges un color de la imagen y el software selecciona todos los pixeles parecidos. Puedes refinar por tono, saturación y luminancia. Ejemplo: seleccionas el azul del cielo y lo empujas un poco hacia cian, sin que cambien los azules de la ropa de alguien.</p>
+
+        <h4>2. Power Windows / Máscaras</h4>
+        <p>Dibujas una forma (círculo, cuadrado, curva libre) encima de la imagen y solo esa zona recibe la corrección. Ejemplo clásico: una viñeta suave para oscurecer las esquinas y llevar la atención al centro.</p>
+
+        <h4>3. Tracking</h4>
+        <p>Si el objeto se mueve, la máscara lo sigue. El software detecta el movimiento del sujeto y mueve la máscara automáticamente. Esto es lo que permite, por ejemplo, que la cara de alguien esté más iluminada en toda la toma aunque camine de lado a lado.</p>
+
+        <div class="pull">
+          Un ejemplo real: una cara queda medio oscura. Qualifier sobre el tono de piel → Power Window alrededor del rostro → intersectas las dos → tracking para que siga su caminar → levantas un poco la exposición en esa zona. <span>Un movimiento clásico de colorista</span></div>
+
+        <h4>Skin tone: el sagrado</h4>
+        <p>
+          La piel es el color más delicado del trabajo de color. El ojo humano es extremadamente sensible a tonos de piel "raros". En el vectorscope existe la línea de piel (skin tone line) que va desde el centro hacia aproximadamente la posición de las "11 en punto". Cuando tus tonos de piel quedan alineados en esa línea, se ven naturales, independientemente del color de piel de la persona.
+        </p>
+
+        <div class="warn">
+          <div class="warn__icon">!</div>
+          <div>
+            <h5>Nunca le metas saturación a ciegas a un primer plano</h5>
+            <p>Vas a hacer que la persona se vea anaranjada, cocida, o como si tuviera fiebre. Siempre trata la piel como zona protegida: corrige todo lo demás y deja la piel en un nodo separado donde solo hagas ajustes mínimos.</p>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">07</span>
-        <h2 class="module__title">Calificación secundaria</h2>
+<!-- ============================== MODULE 7 ============================== -->
+<section class="module" id="m7">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 07</div>
+      <div>
+        <div class="module__kicker">La parte emocional</div>
+        <h2 class="module__title">El <em>look</em>: cómo el color cuenta lo que los diálogos no dicen.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          Power windows, qualifiers, máscaras. Aislar la piel sin afectar
-          el cielo. Aislar el cielo sin afectar la piel.
-          La corrección secundaria es donde el grade <em class="module__highlight">respira</em>.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          Aquí entra la parte creativa. Ya corregiste todo, ya tu imagen se ve natural. Ahora le pones un estilo. El look decide si la escena se siente melancólica, cálida, amenazante, nostálgica, o sobrenatural.
         </p>
-        <ul class="module__topics">
-          <li>HSL qualifier y sus limitaciones</li>
-          <li>Power window: forma, tracking, feather</li>
-          <li>Tracking de objetos en movimiento</li>
-          <li>Cómo evitar el "halo" en las máscaras</li>
+
+        <h3>Los looks clásicos</h3>
+
+        <div class="looks">
+          <div class="look look--teal-orange">
+            <div class="look__kind">→ Hollywood</div>
+            <div>
+              <div class="look__name">Teal & Orange</div>
+              <div class="look__desc">Sombras hacia cian, altas hacia naranja. Aprovecha que la piel es anaranjada y el complemento es teal. Es el look dominante del cine desde 2005. Te lo has comido mil veces sin saberlo.</div>
+            </div>
+          </div>
+          <div class="look look--warm">
+            <div class="look__kind">→ Nostálgico</div>
+            <div>
+              <div class="look__name">Golden Hour</div>
+              <div class="look__desc">Todo empujado hacia ámbar y amarillo. Nostalgia, recuerdo, infancia, recuerdos felices. Se usa mucho en flashbacks y publicidad emocional.</div>
+            </div>
+          </div>
+          <div class="look look--cold">
+            <div class="look__kind">→ Distancia</div>
+            <div>
+              <div class="look__name">Blue Cold</div>
+              <div class="look__desc">Sombras profundas, azules dominantes. Ciencia ficción, drama, aislamiento, tecnología, hospitales. Todo lo "distante" va aquí.</div>
+            </div>
+          </div>
+          <div class="look look--bleach">
+            <div class="look__kind">→ Realismo crudo</div>
+            <div>
+              <div class="look__name">Bleach Bypass</div>
+              <div class="look__desc">Saturación reducida, contraste brutal, sensación metálica. Un clásico en cine bélico y thrillers policiacos. "Saving Private Ryan" es el catálogo.</div>
+            </div>
+          </div>
+          <div class="look look--matrix">
+            <div class="look__kind">→ Conspiración</div>
+            <div>
+              <div class="look__name">Green Shift</div>
+              <div class="look__desc">Verde dominante en medios tonos. Matrix, Fincher, thrillers oscuros. Transmite "algo anda mal" sin decirlo.</div>
+            </div>
+          </div>
+          <div class="look look--pastel">
+            <div class="look__kind">→ Wes Anderson</div>
+            <div>
+              <div class="look__name">Pastel Film</div>
+              <div class="look__desc">Pastel saturado, contraste bajo, paletas casi infantiles. Cine indie, comedias ligeras, contenido de moda y lifestyle.</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>LUTs: atajos, no destinos</h3>
+        <p>
+          Una <strong>LUT</strong> (Look-Up Table) es básicamente un preset de color: una tabla que mapea colores de entrada a colores de salida. Hay miles gratis y de paga. Son útiles por dos razones:
+        </p>
+        <ul>
+          <li><strong>LUTs técnicas:</strong> transforman de LOG a Rec.709 sin darle un "look". Te sirven para trabajar en un espacio neutro.</li>
+          <li><strong>LUTs creativas:</strong> emulan películas físicas (Kodak 2383, Portra 400), o replican looks famosos. Perfectas como punto de partida.</li>
         </ul>
+
+        <div class="warn">
+          <div class="warn__icon">!</div>
+          <div>
+            <h5>El error clásico del principiante</h5>
+            <p>Aplicar una LUT encima de material LOG mal expuesto y pensar que ya quedó. La LUT no corrige: solo colorea lo que le pongas. Siempre <strong>corriges primero</strong>, después aplicas la LUT, y después ajustas la intensidad (normalmente al 60–80%). Nunca al 100%.</p>
+          </div>
+        </div>
+
+        <h3>Teoría de color rápida para coloristas</h3>
+        <p>
+          Los <strong>colores complementarios</strong> son los que están opuestos en la rueda de color: rojo/cian, azul/naranja, verde/magenta. Cuando los pones juntos en una imagen, crean tensión visual y se "ven bien" (es puro cableado del ojo humano). Por eso funciona el teal/orange.
+        </p>
+        <p>
+          Los <strong>colores análogos</strong> (vecinos en la rueda) crean armonía, calma. Los <strong>tríadas</strong> (tres colores equidistantes) dan variedad sin caos. Pensar en estas relaciones elevará tus looks un nivel completo.
+        </p>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">08</span>
-        <h2 class="module__title">Corrección de piel</h2>
+<!-- ============================== MODULE 8 ============================== -->
+<section class="module" id="m8">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 08</div>
+      <div>
+        <div class="module__kicker">Dónde se hace el trabajo</div>
+        <h2 class="module__title">Software: el reinado de <em>Resolve</em> y las alternativas honestas.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          El tono de piel es lo primero que el ojo humano detecta como "mal".
-          La línea de piel en el vectorscopio y por qué todos los tonos
-          de piel <em class="module__highlight">caen en el mismo eje</em>.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          Cada suite de edición tiene sus herramientas de color. Pero hay una que define el estándar de la industria y que, milagrosamente, es gratis.
         </p>
-        <ul class="module__topics">
-          <li>La skin line a las 10-11 en el vectorscopio</li>
-          <li>Cómo ajustar piel sin afectar el resto de la imagen</li>
-          <li>Diferencia entre corregir y embellecer</li>
-          <li>Tonos de piel oscuros: errores comunes</li>
-        </ul>
+
+        <div class="software full">
+          <div class="sw-row">
+            <h5>DaVinci Resolve</h5>
+            <p>El estándar de la industria, desde comerciales hasta cine feature. Página "Color" basada en nodos (cada corrección es un nodo, encadenas, ramificas, deshaces selectivo). La versión gratuita alcanza para el 95% del trabajo; Studio agrega algunos efectos, ruido de grano y más opciones de exportación.</p>
+            <div class="sw-badge sw-badge--king">REY · Gratis</div>
+          </div>
+          <div class="sw-row">
+            <h5>Adobe Premiere Pro — Lumetri</h5>
+            <p>El panel de color integrado. Suficiente para YouTube, redes, trabajo editorial, piezas cortas. Menos poderoso que Resolve pero integrado al flujo de Adobe. Si ya editas en Premiere, tu cabeza ya está aquí.</p>
+            <div class="sw-badge sw-badge--pro">SUSCRIPCIÓN</div>
+          </div>
+          <div class="sw-row">
+            <h5>Final Cut Pro — Color Wheels</h5>
+            <p>El color de Final Cut. Rápido, intuitivo, ruedas limpias, buena integración con magic mask. Popular entre editores de Apple que hacen contenido independiente.</p>
+            <div class="sw-badge sw-badge--pro">PAGO ÚNICO</div>
+          </div>
+          <div class="sw-row">
+            <h5>FilmConvert · Dehancer</h5>
+            <p>Plugins que emulan películas físicas (Kodak, Fuji, Cinestill) con granos, halation, curvas de color reales. Se usan encima del color corrector. Son opcionales pero dan ese último toque que separa un video aficionado de uno pulido.</p>
+            <div class="sw-badge sw-badge--plugin">PLUGINS</div>
+          </div>
+          <div class="sw-row">
+            <h5>CapCut / InShot / VN</h5>
+            <p>Editores móviles con controles básicos de color. Suficiente para stories, contenido informal, edición rápida. No sustituyen un flujo profesional, pero son la puerta de entrada de mucha gente.</p>
+            <div class="sw-badge sw-badge--free">MÓVIL</div>
+          </div>
+        </div>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>¿Por dónde empezar?</h5>
+            <p>Si vas en serio: descarga DaVinci Resolve (gratis, blackmagicdesign.com), busca un tutorial de "Resolve color page basics" y sigue 2 horas de tutorial con un clip propio. Es el salto más redituable que puedes dar.</p>
+          </div>
+        </div>
+
+        <h3>Atajos que te regresan tiempo de vida</h3>
+        <div class="shortcuts">
+          <div class="shortcut"><kbd>Shift + H</kbd><span>Marcar "still" (fotograma de referencia) en Resolve</span></div>
+          <div class="shortcut"><kbd>Alt/Opt + S</kbd><span>Crear un nodo nuevo en la cadena</span></div>
+          <div class="shortcut"><kbd>N</kbd><span>Activar/desactivar nodo (ver antes/después)</span></div>
+          <div class="shortcut"><kbd>Ctrl/Cmd + D</kbd><span>Bypass general — quitar todo el grade</span></div>
+          <div class="shortcut"><kbd>[ y ]</kbd><span>Navegar entre clips en la timeline</span></div>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">09</span>
-        <h2 class="module__title">LUTs: uso correcto</h2>
+<!-- ============================== MODULE 9 ============================== -->
+<section class="module" id="m9">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 09</div>
+      <div>
+        <div class="module__kicker">El flujo real</div>
+        <h2 class="module__title">Cómo se hace <em>en serio</em>: pipeline de principio a fin.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          Una LUT no es un filtro de Instagram. Cómo usarlas como punto de partida,
-          cuándo NO usarlas, y por qué una LUT de conversión
-          no es lo mismo que una LUT <em class="module__highlight">de look</em>.
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <p class="lead">
+          Lo que vas a hacer cuando abras tu primer proyecto real. Este flujo se respeta en productoras de cualquier tamaño, solo cambian las escalas.
         </p>
-        <ul class="module__topics">
-          <li>LUT 1D vs. LUT 3D</li>
-          <li>LUT de input (IDT) vs. LUT de output (ODT)</li>
-          <li>Cómo construir tu propia LUT de look</li>
-          <li>Exportar .cube desde DaVinci Resolve</li>
-        </ul>
+
+        <div class="ba full">
+          <div class="ba__label">Antes / Después — prueba arrastrando la barra</div>
+          <div class="ba__container" id="ba">
+            <div class="ba__img ba__before" id="before">sin corregir · LOG plano</div>
+            <div class="ba__img ba__after" id="after">después del grade</div>
+            <div class="ba__tag ba__tag--before">BEFORE</div>
+            <div class="ba__tag ba__tag--after">AFTER</div>
+            <div class="ba__handle" id="handle"></div>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Importar y organizar</h4>
+              <p>Copia el material a un disco de trabajo rápido (SSD). Organiza por escena, cámara, toma. Renombra con un sistema claro (ESCENA_CAM_TOMA). Tu yo del futuro te lo agradecerá tres veces.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Edita primero — color después</h4>
+              <p>Nunca colorees lo que todavía puede salir del corte final. Haz primero el picture lock (edición cerrada). Cuando la edición está aprobada, empiezas a colorear.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Aplica una LUT técnica solo para ver</h4>
+              <p>Sobre el material LOG, pon una LUT de transformación (por ejemplo "S-Log3 to Rec.709") en un <em>nodo de visualización</em> al final de la cadena. Te sirve para ver algo parecido a un video normal mientras corriges. No es permanente.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Primaria por toma</h4>
+              <p>Toma por toma: exposición, balance, contraste, saturación. Usa los scopes como religión. Ve rápido, sin obsesionarte.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Matching dentro de cada escena</h4>
+              <p>Dentro de una misma escena, todas las tomas deben parecerse. Elige una toma "hero" bien expuesta y ajusta las demás hasta que compartan el mismo feel.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Look / grading creativo</h4>
+              <p>En un nodo separado (o en un grupo), aplica el look del proyecto. Puede ser global para todo el video o variar por capítulo. Mantenlo separado para poder ajustar intensidad fácil.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Secundaria y retoques</h4>
+              <p>Ahora sí lo quirúrgico: skin tones, cielos, ropa problemática, viñetas. Todo en nodos individuales para poder editar después sin romper lo anterior.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>QC (quality check) con ojos frescos</h4>
+              <p>Descansa 30 min. Revisa el corte completo de principio a fin. Busca saltos de color entre escenas, ruido mal distribuido, clips olvidados, reventones. Toma notas y ajusta.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num"></div>
+            <div class="step__body">
+              <h4>Exporta al espacio de color de destino</h4>
+              <p>Para YouTube/Instagram/TV: <code>Rec.709</code> con <code>sRGB</code> o <code>2.4 gamma</code>. Para cine o HDR, son otros espacios. Verifica con el cliente o la plataforma. Un archivo exportado en el espacio equivocado se ve feo aunque haya quedado perfecto en tu timeline.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">10</span>
-        <h2 class="module__title">Pipeline de entrega</h2>
+<!-- ============================== MODULE 10 ============================== -->
+<section class="module" id="m10">
+  <div class="shell">
+    <header class="module__header">
+      <div class="module__num">MÓDULO 10</div>
+      <div>
+        <div class="module__kicker">Lo que nadie te dice</div>
+        <h2 class="module__title">Tips de <em>oro</em> + Glosario rápido.</h2>
       </div>
-      <div class="module__body">
-        <p class="module__desc">
-          Rec.709, HDR10, HLG, Dolby Vision. Qué le vas a entregar a quién
-          y en qué espacio. La diferencia entre <em class="module__highlight">render</em> y <em class="module__highlight">entrega</em>
-          puede arruinar semanas de trabajo.
-        </p>
-        <ul class="module__topics">
-          <li>Especificaciones de entrega por plataforma (YouTube, Netflix, broadcast)</li>
-          <li>HDR: qué es y qué no es</li>
-          <li>Loudness y color en la misma entrega</li>
-          <li>Proxies, masters y archivos de archivo</li>
+    </header>
+
+    <div class="module__body">
+      <div class="prose">
+        <h3>Tips que se aprenden a madrazos</h3>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>Tus ojos se cansan. En serio.</h5>
+            <p>Después de 40 minutos mirando la misma toma, ya no ves los matices. Haz pausas, sal a caminar, regresa. Es la diferencia entre un grade que se siente intencional y uno que se siente "de más".</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>Tu entorno importa tanto como tu monitor.</h5>
+            <p>Paredes grises neutras. Luz ambiental suave y blanca (no foquitos LED de colores). Si tu cuarto es rojo, tus ojos van a compensar y todo te parecerá verde. Ambiente = herramienta.</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>Calibra tu monitor.</h5>
+            <p>Sin monitor calibrado no puedes estar seguro de lo que ves. Lo ideal es un colorímetro (Datacolor, X-Rite Calibrite) y hacerlo cada mes. Mínimo: ponlo en sRGB, brillo al 50%, contraste al 50%, y temperatura en 6500K.</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>Trabaja con nodos (o capas).</h5>
+            <p>Un nodo = una intención. Primaria en un nodo, contraste en otro, skin en otro, look en otro. Si algo no te gusta, apagas ese nodo y sigues. Si amontonas todo en un mismo control, cuando te arrepientas, te arrepientes de todo.</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>Compara siempre antes/después.</h5>
+            <p>Tecla <code>N</code> en Resolve para apagar el nodo activo. Hazlo cada 5 minutos. Vas a descubrir que muchas cosas que parecían mejoras en realidad eran ruidosas.</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>Hay un tutorial de YouTube para cualquier duda que tengas.</h5>
+            <p>Canales como <strong>Waqas Qazi (The Color Grading Academy)</strong>, <strong>Cullen Kelly</strong>, <strong>Darren Mostyn</strong> y <strong>Team 2 Films</strong> son oro. Empieza viendo uno completo de "Resolve Color Page for Beginners" y otro de "How to Match Shots".</p>
+          </div>
+        </div>
+
+        <h3>Errores comunes que vas a cometer (es parte del viaje)</h3>
+        <ul>
+          <li><strong>Sobre-saturar todo.</strong> Al principio todo se siente "poco vibrante". Confía en lo sutil.</li>
+          <li><strong>Aplicar una LUT al 100% y creer que ya.</strong> La LUT es punto de partida, no destino.</li>
+          <li><strong>Coleccionar LUTs en vez de aprender a colorear.</strong> La dopamina de "bajar el pack de 500 LUTs cinematográficas" es una trampa.</li>
+          <li><strong>No respetar la piel.</strong> Cara verde = fin de la carrera. Siempre protégela.</li>
+          <li><strong>Trabajar con el monitor muy brillante.</strong> Vas a subexponer todo porque tu pantalla te miente.</li>
+          <li><strong>No comparar con una toma bien expuesta de referencia.</strong> Te conviertes en tu propio eco.</li>
         </ul>
+
+        <h3>Glosario express</h3>
+        <dl class="glossary">
+          <div><dt>LUT</dt><dd>Look Up Table. Preset matemático que transforma colores de entrada en colores de salida. Como un "filtro" pero más técnico.</dd></div>
+          <div><dt>LOG</dt><dd>Curva logarítmica que captura mayor rango dinámico a costa de verse lavado. El material crudo de tu amiga, seguro.</dd></div>
+          <div><dt>RAW</dt><dd>Datos sin procesar del sensor. Máxima flexibilidad en post. Archivos pesadísimos.</dd></div>
+          <div><dt>Rec.709</dt><dd>Estándar de color para HD y la mayoría de pantallas de consumo. El "modo normal".</dd></div>
+          <div><dt>Rec.2020</dt><dd>Estándar más nuevo, para 4K HDR. Gamut más amplio.</dd></div>
+          <div><dt>Gamut</dt><dd>Rango total de colores que un espacio puede representar.</dd></div>
+          <div><dt>Bit depth</dt><dd>Cuántos tonos por canal. 8-bit = 256 niveles. 10-bit = 1024. 12-bit = 4096. Más bits = menos banding.</dd></div>
+          <div><dt>Banding</dt><dd>Escalones visibles en degradados suaves. Enemigo del cielo al atardecer.</dd></div>
+          <div><dt>IRE</dt><dd>Unidad de medida del waveform (0 = negro, 100 = blanco). Viene de la televisión analógica.</dd></div>
+          <div><dt>Clipping</dt><dd>Cuando la información rebasa el tope (altas clipped = blanco puro, sin detalle).</dd></div>
+          <div><dt>Crush</dt><dd>Mismo concepto, pero en las sombras (sombras crushed = negro puro, sin detalle).</dd></div>
+          <div><dt>Nodo</dt><dd>Unidad de corrección en Resolve. Cada nodo hace una cosa y se conectan en cadena.</dd></div>
+          <div><dt>Power Window</dt><dd>Máscara con forma que aísla una zona de la imagen para corrección local.</dd></div>
+          <div><dt>Qualifier</dt><dd>Herramienta de selección por color/luminancia/saturación.</dd></div>
+          <div><dt>Tracking</dt><dd>Que una máscara siga automáticamente a un sujeto en movimiento.</dd></div>
+          <div><dt>Lift / Gamma / Gain</dt><dd>Sombras / Medios / Altas luces en el idioma del colorista.</dd></div>
+          <div><dt>Offset</dt><dd>Control que mueve toda la imagen pareja hacia arriba o abajo de brillo.</dd></div>
+          <div><dt>Shot match</dt><dd>Hacer que dos tomas se parezcan. El pan y la sal del colorista.</dd></div>
+          <div><dt>DIT</dt><dd>Digital Imaging Technician. Quien cuida el color en el set. A veces prepara LUTs de cámara.</dd></div>
+          <div><dt>DI</dt><dd>Digital Intermediate. El proceso completo de postproducción de imagen en cine.</dd></div>
+        </dl>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="module">
-      <div class="module__header">
-        <span class="module__num">11</span>
-        <h2 class="module__title">El lenguaje del color</h2>
-      </div>
-      <div class="module__body">
-        <p class="module__desc">
-          Por qué las películas de superhéroes son naranja-azul.
-          Cómo el color construye emociones, períodos históricos, mundos.
-          La técnica al servicio de <em class="module__highlight">algo que decir</em>.
-        </p>
-        <ul class="module__topics">
-          <li>Contraste de temperatura como herramienta narrativa</li>
-          <li>Referencia de looks: cómo analizar un grade ajeno</li>
-          <li>La paleta de Kubrick, Wong Kar-wai, Fincher</li>
-          <li>Cuando el color sobra y cuando falta</li>
-        </ul>
-      </div>
-    </div>
+<!-- ============================== OUTRO ============================== -->
+<section class="outro">
+  <div class="shell">
+    <h2>Y así, lo "descolorido"<br>se vuelve <em>película</em>.</h2>
+    <p>
+      La próxima vez que veas a tu amiga "coloreando", sabrás que no es pintar con Prismacolor (aunque la imagen sigue siendo divina): es esculpir luz con curvas, ruedas y máscaras para que una toma sienta exactamente lo que tiene que sentir. Ahora tienes el vocabulario para platicarlo con ella en su idioma.
+    </p>
+    <div class="outro__sig">Fin de clase · Ahora a practicar</div>
+  </div>
+</section>
 
-  </div><!-- /module-list -->
+<script>
+  // Progress bar
+  const bar = document.getElementById('bar');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    bar.style.width = scrolled + '%';
+  });
 
-  <footer class="footer">
-    Jorge Malgesto · Visual y técnica · 2025
-  </footer>
+  // Before/After slider
+  const ba = document.getElementById('ba');
+  const after = document.getElementById('after');
+  const handle = document.getElementById('handle');
+  let dragging = false;
 
-</div>
+  function updateBA(e) {
+    const rect = ba.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    after.style.clipPath = `inset(0 0 0 ${pct}%)`;
+    handle.style.left = pct + '%';
+  }
+
+  ba.addEventListener('mousedown', (e) => { dragging = true; updateBA(e); });
+  ba.addEventListener('touchstart', (e) => { dragging = true; updateBA(e); });
+  window.addEventListener('mousemove', (e) => { if (dragging) updateBA(e); });
+  window.addEventListener('touchmove', (e) => { if (dragging) updateBA(e); });
+  window.addEventListener('mouseup', () => dragging = false);
+  window.addEventListener('touchend', () => dragging = false);
+  ba.addEventListener('click', updateBA);
+</script>
 
 </body>
 </html>
