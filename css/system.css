@@ -5,34 +5,34 @@
 
 /* ── Tokens: Paleta ─────────────────────────────────────── */
 :root {
-  /* Backgrounds — tinte verde oscuro, casi imperceptible */
-  --color-bg:           #080e08;
-  --color-bg-card:      #0d160d;
-  --color-bg-soft:      #131e13;
+  /* Backgrounds — papel cálido con tinte verde muy sutil */
+  --color-bg:           #f5f0e6;
+  --color-bg-card:      #ede8d8;
+  --color-bg-soft:      #e4dece;
 
-  /* Texto — cálido */
-  --color-text:         #e8e0cc;
-  --color-text-soft:    #c8bfa8;
-  --color-text-mute:    #8a8070;
-  --color-text-dim:     #6b6050;
-  --color-text-faint:   #4a3e30;
+  /* Texto — oscuro cálido */
+  --color-text:         #1a1508;
+  --color-text-soft:    #3d3420;
+  --color-text-mute:    #6b6050;
+  --color-text-dim:     #8a8070;
+  --color-text-faint:   #b0a888;
 
-  /* Bordes — con tinte verde */
-  --color-border:       #1a261a;
-  --color-border-soft:  #243424;
+  /* Bordes — cálido claro con tinte verde */
+  --color-border:       #ccc4a8;
+  --color-border-soft:  #bab09a;
 
-  /* Acento principal — verde rasta */
-  --color-accent:       #7ab648;
-  --color-accent-hover: #5e9436;
-  --color-accent-soft:  rgba(122, 182, 72, 0.1);
+  /* Acento principal — verde rasta (oscurecido para contraste sobre claro) */
+  --color-accent:       #4e8020;
+  --color-accent-hover: #3a6016;
+  --color-accent-soft:  rgba(78, 128, 32, 0.1);
 
   /* Dorado — secundario, decorativo */
-  --color-gold:         #c8922a;
-  --color-gold-soft:    rgba(200, 146, 42, 0.1);
+  --color-gold:         #a07018;
+  --color-gold-soft:    rgba(160, 112, 24, 0.1);
 
   /* Rojo — terciario, con moderación */
-  --color-red:          #c84030;
-  --color-red-soft:     rgba(200, 64, 48, 0.1);
+  --color-red:          #a02818;
+  --color-red-soft:     rgba(160, 40, 24, 0.1);
 }
 
 /* ── Tokens: Tipografía ─────────────────────────────────── */

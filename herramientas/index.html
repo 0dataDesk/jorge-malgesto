@@ -11,19 +11,19 @@
 
   <style>
     :root {
-      --bg:        #080e08;
-      --bg2:       #0d160d;
-      --bg3:       #131e13;
-      --text:      #e8e0cc;
-      --soft:      #c8bfa8;
-      --mute:      #8a8070;
-      --dim:       #6b6050;
-      --faint:     #4a3e30;
-      --border:    #1a261a;
-      --border2:   #243424;
-      --green:     #7ab648;
-      --gold:      #c8922a;
-      --red:       #c84030;
+      --bg:        #f5f0e6;
+      --bg2:       #ede8d8;
+      --bg3:       #e4dece;
+      --text:      #1a1508;
+      --soft:      #3d3420;
+      --mute:      #6b6050;
+      --dim:       #8a8070;
+      --faint:     #b0a888;
+      --border:    #ccc4a8;
+      --border2:   #bab09a;
+      --green:     #4e8020;
+      --gold:      #a07018;
+      --red:       #a02818;
       --serif:     'Fraunces', Georgia, serif;
       --sans:      'DM Sans', system-ui, sans-serif;
       --mono:      'JetBrains Mono', monospace;
@@ -62,7 +62,7 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       padding: 72px 28px 28px;
-      filter: blur(10px) brightness(0.2) saturate(0.4);
+      filter: blur(10px) brightness(1.05) saturate(0.25);
       pointer-events: none;
       user-select: none;
       z-index: 0;
@@ -140,10 +140,10 @@
       z-index: 1;
       background: radial-gradient(
         ellipse 75% 70% at 50% 50%,
-        rgba(8,14,8,0.1) 0%,
-        rgba(8,14,8,0.5) 55%,
-        rgba(8,14,8,0.93) 80%,
-        #080e08 100%
+        rgba(245,240,230,0.1) 0%,
+        rgba(245,240,230,0.55) 55%,
+        rgba(245,240,230,0.94) 80%,
+        #f5f0e6 100%
       );
       pointer-events: none;
     }
