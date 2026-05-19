@@ -4,23 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jorge Malgesto</title>
-  <meta name="description" content="Cuaderno de un bajista que también lee.">
+  <meta name="description" content="Bajo · Datos · CDMX">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="css/system.css">
 
   <style>
-    /* ── Layout del shell ─────────────────────────────────── */
+    /* ── Franja rasta fija ──────────────────────────────── */
+    .rasta-stripe {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      display: flex;
+      z-index: 100;
+    }
+    .rasta-stripe span { flex: 1; }
+    .rasta-stripe span:nth-child(1) { background: #7ab648; }
+    .rasta-stripe span:nth-child(2) { background: #c8922a; }
+    .rasta-stripe span:nth-child(3) { background: #c84030; }
+
+    /* ── Shell ──────────────────────────────────────────── */
     .shell {
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
+      padding-top: 3px; /* espacio para la franja */
     }
 
-    /* ── Header ───────────────────────────────────────────── */
+    /* ── Header ─────────────────────────────────────────── */
     .site-header {
       padding: var(--sp-5) var(--sp-5) 0;
     }
@@ -34,16 +47,16 @@
       color: var(--color-text-faint);
     }
 
-    /* ── Main ─────────────────────────────────────────────── */
+    /* ── Main ────────────────────────────────────────────── */
     .site-main {
       flex: 1;
       padding: var(--sp-7) var(--sp-5) var(--sp-8);
       max-width: 640px;
     }
 
-    /* ── Hero ─────────────────────────────────────────────── */
+    /* ── Hero ────────────────────────────────────────────── */
     .hero {
-      margin-bottom: var(--sp-8);
+      margin-bottom: var(--sp-7);
     }
 
     .hero__tagline {
@@ -56,13 +69,52 @@
       line-height: 1.6;
     }
 
-    /* ── Navegación ───────────────────────────────────────── */
+    /* ── Identity strip ─────────────────────────────────── */
+    .identity {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-3);
+      margin-top: var(--sp-5);
+      flex-wrap: wrap;
+    }
+
+    .identity-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .identity-label {
+      font-family: var(--font-serif);
+      font-size: var(--fs-h3);
+      font-weight: 500;
+      font-style: italic;
+      color: var(--color-text-mute);
+      line-height: 1;
+    }
+
+    .identity-sub {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-text-faint);
+    }
+
+    .identity-sep {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-border-soft);
+      align-self: flex-start;
+      margin-top: 3px;
+    }
+
+    /* ── Nav ─────────────────────────────────────────────── */
     .site-nav {
       display: flex;
       flex-direction: column;
     }
 
-    /* ── Descripción breve de sección ─────────────────────── */
     .nav-item__desc {
       font-family: var(--font-serif);
       font-size: var(--fs-small);
@@ -78,11 +130,29 @@
       flex: 1;
     }
 
-    /* ── Footer ───────────────────────────────────────────── */
+    /* Indicador de acceso restringido */
+    .nav-item__lock {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-text-faint);
+      background: var(--color-bg-card);
+      border: 0.5px solid var(--color-border);
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
     .site-footer {
       padding: var(--sp-5);
       border-top: var(--border-thin);
       margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .site-footer__text {
@@ -94,31 +164,33 @@
       color: var(--color-text-faint);
     }
 
-    /* ── Desktop ──────────────────────────────────────────── */
+    .site-footer__ig {
+      font-family: var(--font-mono);
+      font-size: var(--fs-mono-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-text-faint);
+      transition: color 150ms;
+    }
+
+    .site-footer__ig:hover { color: var(--color-accent); }
+
+    /* ── Responsive ──────────────────────────────────────── */
     @media (min-width: 768px) {
-      .site-header {
-        padding: var(--sp-6) var(--sp-7) 0;
-      }
-
-      .site-main {
-        padding: var(--sp-8) var(--sp-7) var(--sp-8);
-      }
-
-      .site-footer {
-        padding: var(--sp-6) var(--sp-7);
-      }
-
-      .hero {
-        margin-bottom: var(--sp-8);
-      }
-
-      .nav-item {
-        padding: var(--sp-7) 0;
-      }
+      .site-header { padding: var(--sp-6) var(--sp-7) 0; }
+      .site-main   { padding: var(--sp-8) var(--sp-7) var(--sp-8); }
+      .site-footer { padding: var(--sp-6) var(--sp-7); }
+      .hero        { margin-bottom: var(--sp-8); }
+      .nav-item    { padding: var(--sp-7) 0; }
     }
   </style>
 </head>
 <body>
+
+<!-- Franja rasta -->
+<div class="rasta-stripe" aria-hidden="true">
+  <span></span><span></span><span></span>
+</div>
 
 <div class="shell">
 
@@ -132,22 +204,45 @@
 
     <!-- Hero -->
     <section class="hero">
+
       <span class="wordmark" aria-label="Jorge, y Malgesto.">
         <span class="wordmark__first">jorge,</span>
         <span class="wordmark__second">y mal<span class="wordmark__accent">gesto</span>.</span>
       </span>
-      <p class="hero__tagline">Cuaderno de un bajista que también lee.</p>
+
+      <p class="hero__tagline">
+        Cuaderno de un bajista que también construye cosas.
+      </p>
+
+      <!-- Identity strip -->
+      <div class="identity" aria-label="Bajo · Datos · CDMX">
+        <div class="identity-item">
+          <span class="identity-label">Bajo</span>
+          <span class="identity-sub">Davis Don · Leocadio · Juana</span>
+        </div>
+        <span class="identity-sep">·</span>
+        <div class="identity-item">
+          <span class="identity-label">Datos</span>
+          <span class="identity-sub">dataDesk</span>
+        </div>
+        <span class="identity-sep">·</span>
+        <div class="identity-item">
+          <span class="identity-label">CDMX</span>
+        </div>
+      </div>
+
     </section>
 
-    <!-- Navegación -->
-    <nav class="site-nav" aria-label="Apartados del sitio">
+    <!-- Navegación / Apartados -->
+    <nav class="site-nav" aria-label="Apartados">
 
       <a href="herramientas/" class="nav-item">
         <span class="nav-item__num">01 ──</span>
         <span class="nav-item__content">
           <span class="nav-item__label">Herramientas</span>
-          <span class="nav-item__desc">Hartke recomendador, afinador, setlist navegador.</span>
+          <span class="nav-item__desc">Afinador, EQ del Hartke, setlist navegador. Para tocar mejor.</span>
         </span>
+        <span class="nav-item__lock">Acceso IG</span>
         <span class="nav-item__arrow" aria-hidden="true">→</span>
       </a>
 
@@ -155,7 +250,7 @@
         <span class="nav-item__num">02 ──</span>
         <span class="nav-item__content">
           <span class="nav-item__label">Conocimiento</span>
-          <span class="nav-item__desc">Cine, cultura, música. Una estantería curada.</span>
+          <span class="nav-item__desc">Corrección de color, rastafari, armonía de bajo. Una estantería curada.</span>
         </span>
         <span class="nav-item__arrow" aria-hidden="true">→</span>
       </a>
@@ -166,7 +261,8 @@
 
   <!-- Footer -->
   <footer class="site-footer">
-    <p class="site-footer__text">Jorge Malgesto · Cuaderno personal · &copy; 2026</p>
+    <p class="site-footer__text">Jorge Malgesto · 2026</p>
+    <a href="https://instagram.com/jorgemalgesto" class="site-footer__ig" target="_blank" rel="noopener">@jorgemalgesto</a>
   </footer>
 
 </div>

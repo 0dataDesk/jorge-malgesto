@@ -1,26 +1,38 @@
 /* ============================================================
    system.css — Sistema de diseño jorge-malgesto
-   Dirección A: Editorial con grietas
+   Dirección: Rasta discreta · verde / dorado / rojo
    ============================================================ */
 
 /* ── Tokens: Paleta ─────────────────────────────────────── */
 :root {
-  --color-bg:           #0d0d0d;
-  --color-bg-card:      #141414;
-  --color-bg-soft:      #1a1814;
+  /* Backgrounds — tinte verde oscuro, casi imperceptible */
+  --color-bg:           #080e08;
+  --color-bg-card:      #0d160d;
+  --color-bg-soft:      #131e13;
 
-  --color-text:         #f0ebe2;
-  --color-text-soft:    #d8d1c2;
-  --color-text-mute:    #8a8275;
-  --color-text-dim:     #6b6258;
-  --color-text-faint:   #5c544a;
+  /* Texto — cálido */
+  --color-text:         #e8e0cc;
+  --color-text-soft:    #c8bfa8;
+  --color-text-mute:    #8a8070;
+  --color-text-dim:     #6b6050;
+  --color-text-faint:   #4a3e30;
 
-  --color-border:       #2a2620;
-  --color-border-soft:  #3a342c;
+  /* Bordes — con tinte verde */
+  --color-border:       #1a261a;
+  --color-border-soft:  #243424;
 
-  --color-accent:       #d44530;
-  --color-accent-hover: #b53924;
-  --color-accent-soft:  #6b2218;
+  /* Acento principal — verde rasta */
+  --color-accent:       #7ab648;
+  --color-accent-hover: #5e9436;
+  --color-accent-soft:  rgba(122, 182, 72, 0.1);
+
+  /* Dorado — secundario, decorativo */
+  --color-gold:         #c8922a;
+  --color-gold-soft:    rgba(200, 146, 42, 0.1);
+
+  /* Rojo — terciario, con moderación */
+  --color-red:          #c84030;
+  --color-red-soft:     rgba(200, 64, 48, 0.1);
 }
 
 /* ── Tokens: Tipografía ─────────────────────────────────── */
@@ -126,7 +138,7 @@ img, svg {
 
 .wordmark__accent {
   font-style: italic;
-  color: var(--color-accent);
+  color: var(--color-gold);   /* Dorado, no verde */
 }
 
 /* ── Componente: .accent-text ───────────────────────────── */
@@ -223,7 +235,7 @@ img, svg {
 
 .btn--primary {
   background-color: var(--color-accent);
-  color: var(--color-text);
+  color: var(--color-bg);
   border-color: var(--color-accent);
 }
 
