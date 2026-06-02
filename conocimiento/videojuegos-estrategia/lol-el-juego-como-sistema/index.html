@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Juego como Sistema · League of Legends · Conocimiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400;1,9..144,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #f5f0e6;
+    --bg-2:     #ece8e2;
+    --bg-3:     #e4dfd8;
+    --bg-card:  #eae5de;
+    --ink:      #1a1508;
+    --ink-soft: #3d342a;
+    --ink-dim:  #6b6050;
+    --ink-faint:#b0a888;
+
+    --blue:     #1a5080;
+    --blue-mid: #1d6098;
+    --blue-soft:rgba(26, 80, 128, 0.10);
+    --blue-bg:  rgba(26, 80, 128, 0.06);
+    --gold:     #a07018;
+    --gold-soft:rgba(160, 112, 24, 0.10);
+    --crimson:  #a02818;
+
+    --rule:       rgba(30, 20, 10, 0.08);
+    --rule-strong:rgba(30, 20, 10, 0.16);
+
+    --display: 'Fraunces', ui-serif, Georgia, serif;
+    --body:    'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --mono:    'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    z-index: 200;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 0.9 0 0 0 0 0.8 0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+
+  /* Progress bar */
+  .progress {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 300;
+  }
+  .progress__bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--blue), var(--blue-mid), var(--gold));
+    transition: width 0.1s linear;
+  }
+
+  /* Stripe top */
+  .stripe {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    display: flex;
+    z-index: 100;
+  }
+  .stripe span { flex: 1; }
+  .stripe span:nth-child(1) { background: #4e8020; }
+  .stripe span:nth-child(2) { background: var(--gold); }
+  .stripe span:nth-child(3) { background: var(--crimson); }
+
+  /* Shell */
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    padding: 28px 0 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .breadcrumb a {
+    color: var(--ink-faint);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .breadcrumb a:hover { color: var(--ink-dim); }
+  .breadcrumb span { color: var(--ink-faint); }
+
+  /* ===== HERO ===== */
+  .hero {
+    padding: 80px 0 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero__module-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero__module-num::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--blue);
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: clamp(48px, 8vw, 112px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-variation-settings: "opsz" 144;
+    margin-bottom: 40px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--blue);
+  }
+  .hero__lead {
+    max-width: 620px;
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    font-weight: 300;
+    margin-bottom: 48px;
+  }
+  .hero__meta {
+    display: flex;
+    gap: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+  .hero__meta > div { font-family: var(--mono); font-size: 12px; }
+  .hero__meta > div span {
+    display: block;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-size: 10px;
+  }
+  .hero__meta > div strong { color: var(--ink); font-weight: 500; font-size: 13px; }
+
+  /* Map glow decoration */
+  .hero__deco {
+    position: absolute;
+    top: 0; right: -5%;
+    width: 55%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.07;
+    z-index: -1;
+  }
+  .hero__deco svg { width: 100%; height: 100%; }
+
+  /* ===== TOC ===== */
+  .toc {
+    padding: 72px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .toc__title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 36px;
+  }
+  .toc__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+  }
+  .toc__list li {
+    border-top: 1px solid var(--rule);
+    padding: 18px 0;
+  }
+  .toc__list li:nth-child(-n+2) { border-top: none; }
+  .toc__list a {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .toc__list a:hover { color: var(--blue); transform: translateX(5px); }
+  .toc__list .num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    min-width: 28px;
+  }
+  .toc__list .label {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 400;
+    font-style: italic;
+  }
+  @media (max-width: 680px) {
+    .toc__list { grid-template-columns: 1fr; }
+    .toc__list li:nth-child(2) { border-top: 1px solid var(--rule); }
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    padding: 100px 0;
+    position: relative;
+  }
+  .section + .section { border-top: 1px solid var(--rule); }
+
+  .section__header {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 40px;
+    margin-bottom: 56px;
+    align-items: start;
+  }
+  .section__num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-faint);
+    letter-spacing: 0.2em;
+    padding-top: 12px;
+  }
+  .section__title {
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: clamp(34px, 5vw, 60px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 144;
+  }
+  .section__title em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--blue);
+  }
+  .section__kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .section__body {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 40px;
+  }
+  .section__body > * { grid-column: 2; }
+  .section__body > .full { grid-column: 1 / -1; }
+  @media (max-width: 680px) {
+    .section__header, .section__body {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .section__body > * { grid-column: 1; }
+    .section__body > .full { grid-column: 1; }
+  }
+
+  /* Prose */
+  .prose p {
+    margin-bottom: 22px;
+    color: var(--ink-soft);
+    max-width: 68ch;
+    font-weight: 300;
+  }
+  .prose p.lead {
+    font-size: 21px;
+    line-height: 1.55;
+    color: var(--ink);
+    font-weight: 300;
+    max-width: 680px;
+    margin-bottom: 32px;
+    font-family: var(--display);
+    font-style: italic;
+  }
+  .prose strong { color: var(--ink); font-weight: 500; }
+  .prose em { font-style: italic; color: var(--blue); }
+  .prose h3 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 28px;
+    font-style: italic;
+    margin: 52px 0 18px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .prose h4 {
+    font-family: var(--body);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--blue);
+    margin: 32px 0 12px;
+    font-weight: 500;
+  }
+  .prose ul, .prose ol {
+    margin: 14px 0 26px 22px;
+    color: var(--ink-soft);
+  }
+  .prose li { margin-bottom: 8px; font-weight: 300; }
+  .prose code {
+    font-family: var(--mono);
+    font-size: 0.87em;
+    background: var(--bg-3);
+    padding: 2px 7px;
+    border-radius: 3px;
+    color: var(--blue);
+  }
+
+  /* Pull quote */
+  .pull {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(24px, 3vw, 36px);
+    line-height: 1.3;
+    color: var(--ink);
+    padding: 36px 0 36px 28px;
+    border-left: 2px solid var(--blue);
+    margin: 44px 0;
+    max-width: 760px;
+  }
+  .pull span {
+    display: block;
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-style: normal;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* Timeline */
+  .timeline {
+    margin: 40px 0;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 88px;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: var(--rule-strong);
+  }
+  .event {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 36px;
+    padding: 16px 0;
+    position: relative;
+  }
+  .event::before {
+    content: '';
+    position: absolute;
+    left: 84px;
+    top: 26px;
+    width: 9px;
+    height: 9px;
+    background: var(--blue);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+  .event__year {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--blue);
+    font-weight: 500;
+    padding-top: 18px;
+  }
+  .event__body h5 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+  .event__body p {
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height: 1.6;
+  }
+  @media (max-width: 680px) {
+    .timeline::before { left: 8px; }
+    .event { grid-template-columns: 1fr; gap: 4px; padding-left: 28px; }
+    .event::before { left: 4px; top: 8px; }
+    .event__year { padding-top: 0; }
+  }
+
+  /* Concept cards */
+  .concepts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 32px 0;
+  }
+  .concept {
+    background: var(--bg-card);
+    padding: 28px 26px;
+  }
+  .concept__word {
+    font-family: var(--display);
+    font-size: 34px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--blue);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .concept__tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .concept p {
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height: 1.6;
+  }
+
+  /* Role cards */
+  .roles {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 32px 0;
+  }
+  @media (max-width: 760px) { .roles { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 440px) { .roles { grid-template-columns: 1fr; } }
+  .role-card {
+    background: var(--bg-card);
+    padding: 24px 20px;
+  }
+  .role-card__name {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+  .role-card__tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .role-card p {
+    font-size: 13px;
+    color: var(--ink-dim);
+    line-height: 1.55;
+  }
+  .role-card__function {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--rule-strong);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--blue);
+    letter-spacing: 0.05em;
+  }
+
+  /* Phase blocks */
+  .phases {
+    margin: 40px 0;
+    border: 1px solid var(--rule);
+  }
+  .phase {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 36px;
+    padding: 32px;
+    border-bottom: 1px solid var(--rule);
+    align-items: start;
+  }
+  .phase:last-child { border-bottom: none; }
+  .phase__time {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--blue);
+    padding-top: 4px;
+  }
+  .phase__time strong {
+    display: block;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 26px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .phase h5 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .phase p { font-size: 14px; color: var(--ink-dim); line-height: 1.65; margin-bottom: 10px; }
+  .phase p:last-child { margin-bottom: 0; }
+  .phase__clave {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-top: 10px;
+  }
+  @media (max-width: 680px) {
+    .phase { grid-template-columns: 1fr; gap: 12px; }
+  }
+
+  /* Resource equation */
+  .equation {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    padding: 36px 40px;
+    margin: 40px 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .equation__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .equation__step-label {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+    text-align: center;
+  }
+  .equation__step-sub {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-faint);
+    text-align: center;
+  }
+  .equation__arrow {
+    font-size: 22px;
+    color: var(--blue);
+    flex-shrink: 0;
+    margin: 0 4px;
+  }
+  .equation__step--final .equation__step-label { color: var(--blue); }
+
+  /* Objective cards */
+  .objectives {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 32px 0;
+  }
+  .obj-card {
+    background: var(--bg-card);
+    padding: 28px 26px;
+  }
+  .obj-card__name {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .obj-card__timing {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--blue);
+    margin-bottom: 14px;
+  }
+  .obj-card p { font-size: 14px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 8px; }
+  .obj-card p:last-child { margin-bottom: 0; }
+  .obj-card__why {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--rule-strong);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+  }
+
+  /* Rank ladder */
+  .ranks {
+    margin: 40px 0;
+    border: 1px solid var(--rule);
+  }
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row__badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    min-width: 120px;
+    letter-spacing: 0.05em;
+  }
+  .rank-row__bar {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .rank-row__fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--blue);
+    transition: width 0.4s;
+  }
+  .rank-row__pct {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-dim);
+    min-width: 80px;
+    text-align: right;
+  }
+  .rank-row--elite .rank-row__badge { color: var(--gold); }
+  .rank-row--pro .rank-row__badge { color: var(--blue); }
+  .rank-row--you .rank-row__fill { background: var(--gold); }
+
+  /* Tip callout */
+  .tip {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    padding: 22px 28px;
+    background: var(--bg-card);
+    border-left: 2px solid var(--blue);
+    margin: 32px 0;
+  }
+  .tip__icon {
+    font-family: var(--display);
+    font-size: 38px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--blue);
+    line-height: 1;
+  }
+  .tip h5 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .tip p { font-size: 14px; color: var(--ink-dim); }
+
+  /* Warning callout */
+  .warn {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    padding: 22px 28px;
+    background: var(--bg-card);
+    border-left: 2px solid var(--gold);
+    margin: 32px 0;
+  }
+  .warn__icon {
+    font-family: var(--display);
+    font-size: 38px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .warn h5 {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .warn p { font-size: 14px; color: var(--ink-dim); }
+
+  /* Practice steps */
+  .steps { margin: 40px 0; counter-reset: step; }
+  .step {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 28px;
+    padding: 28px 0;
+    border-top: 1px solid var(--rule);
+    counter-increment: step;
+  }
+  .step:last-child { border-bottom: 1px solid var(--rule); }
+  .step__num {
+    font-family: var(--display);
+    font-size: 50px;
+    font-weight: 300;
+    font-style: italic;
+    font-variation-settings: "opsz" 144;
+    color: var(--blue);
+    line-height: 0.9;
+    opacity: 0.7;
+  }
+  .step__num::before { content: counter(step, decimal-leading-zero); }
+  .step__body h4 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .step__body p { color: var(--ink-dim); font-size: 14px; line-height: 1.65; }
+  @media (max-width: 680px) {
+    .step { grid-template-columns: 1fr; gap: 10px; }
+    .step__num { font-size: 38px; }
+  }
+
+  /* Questions */
+  .questions { margin: 40px 0; border-top: 1px solid var(--rule); }
+  .question {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .question__q {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--blue);
+    line-height: 0.9;
+    padding-top: 2px;
+  }
+  .question__body h5 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .question__body p { font-size: 14px; color: var(--ink-dim); }
+
+  /* Outro */
+  .outro {
+    padding: 120px 0;
+    text-align: center;
+    border-top: 1px solid var(--rule);
+  }
+  .outro h2 {
+    font-family: var(--display);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 68px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 144;
+    margin-bottom: 28px;
+  }
+  .outro h2 em {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--blue);
+  }
+  .outro p {
+    max-width: 520px;
+    margin: 0 auto;
+    color: var(--ink-dim);
+    font-size: 17px;
+  }
+  .outro__sig {
+    margin-top: 56px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .outro__next {
+    display: inline-block;
+    margin-top: 40px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--blue);
+    padding: 12px 28px;
+    border: 1px solid var(--blue-soft);
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .outro__next:hover { background: var(--blue-bg); border-color: var(--blue); }
+
+  ::selection { background: var(--blue); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress__bar" id="bar"></div></div>
+
+<div class="stripe" aria-hidden="true">
+  <span></span><span></span><span></span>
+</div>
+
+<!-- ========== BREADCRUMB ========== -->
+<div class="shell">
+  <nav class="breadcrumb">
+    <a href="../../">Jorge Malgesto</a>
+    <span>/</span>
+    <a href="../">Conocimiento</a>
+    <span>/</span>
+    <span>Videojuegos &amp; Estrategia</span>
+    <span>/</span>
+    <span>Módulo 1</span>
+  </nav>
+</div>
+
+<!-- ========== HERO ========== -->
+<section class="hero">
+  <div class="hero__deco" aria-hidden="true">
+    <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <!-- Simplified map hexagon -->
+      <polygon points="300,60 520,180 520,420 300,540 80,420 80,180" stroke="#1a5080" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <polygon points="300,120 460,210 460,390 300,480 140,390 140,210" stroke="#1a5080" stroke-width="0.8" fill="none" opacity="0.4"/>
+      <!-- Lane lines -->
+      <line x1="80" y1="420" x2="520" y2="180" stroke="#1a5080" stroke-width="1" opacity="0.5"/>
+      <line x1="80" y1="300" x2="520" y2="300" stroke="#1a5080" stroke-width="1" opacity="0.5"/>
+      <line x1="80" y1="180" x2="520" y2="420" stroke="#1a5080" stroke-width="1" opacity="0.5"/>
+      <!-- Nexus nodes -->
+      <circle cx="120" cy="450" r="14" stroke="#1a5080" stroke-width="1.5" fill="none" opacity="0.8"/>
+      <circle cx="480" cy="150" r="14" stroke="#1a5080" stroke-width="1.5" fill="none" opacity="0.8"/>
+      <!-- Objective dots -->
+      <circle cx="210" cy="380" r="8" fill="#1a5080" opacity="0.5"/>
+      <circle cx="390" cy="220" r="8" fill="#1a5080" opacity="0.5"/>
+      <circle cx="300" cy="300" r="5" fill="#a07018" opacity="0.6"/>
+    </svg>
+  </div>
+  <div class="shell">
+    <div class="hero__module-num">Módulo 01 · Videojuegos &amp; Estrategia · League of Legends</div>
+    <h1>El juego<br>como <em>sistema</em>.</h1>
+    <p class="hero__lead">
+      League of Legends no es lo que parece desde afuera. No es un juego de matar campeones. Es un sistema de mapa, tiempo y recursos. Este módulo instala ese marco. Todo lo que sigue construye sobre él.
+    </p>
+    <div class="hero__meta">
+      <div><span>Camino</span><strong>Videojuegos &amp; Estrategia</strong></div>
+      <div><span>Módulo</span><strong>01 de 09</strong></div>
+      <div><span>Referencia</span><strong>Season 2026 · Demacia / Pandemonium</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TOC ========== -->
+<section class="toc">
+  <div class="shell">
+    <div class="toc__title">Índice de este módulo</div>
+    <ul class="toc__list">
+      <li><a href="#intro"><span class="num">01</span><span class="label">Por qué importa este módulo</span></a></li>
+      <li><a href="#contexto"><span class="num">02</span><span class="label">De dónde viene todo esto</span></a></li>
+      <li><a href="#conceptos"><span class="num">03</span><span class="label">El vocabulario del mapa</span></a></li>
+      <li><a href="#roles"><span class="num">04</span><span class="label">Los cinco roles como sistema</span></a></li>
+      <li><a href="#objetivos"><span class="num">05</span><span class="label">Los objetivos que ganan partidas</span></a></li>
+      <li><a href="#loop"><span class="num">06</span><span class="label">El loop del juego</span></a></li>
+      <li><a href="#rangos"><span class="num">07</span><span class="label">La escalera 2026</span></a></li>
+      <li><a href="#practica"><span class="num">08</span><span class="label">Aplicación práctica</span></a></li>
+      <li><a href="#seguir"><span class="num">09</span><span class="label">Lo que abre este módulo</span></a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 1: INTRODUCCIÓN ========== -->
+<section class="section" id="intro">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 01</div>
+      <div>
+        <div class="section__kicker">El problema de la primera impresión</div>
+        <h2 class="section__title">Por qué <em>parece</em> caos y no lo es.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p class="lead">
+          La primera vez que ves una partida de League of Legends —o que juegas una— la impresión es de ruido total. Diez personajes moviendose en todas direcciones, números flotando en pantalla, un mapa lleno de íconos imposibles de leer, gente muriendo sin que sepas por qué.
+        </p>
+        <p>
+          Lo que falta no es experiencia. Lo que falta es el marco. Una vez que entiendes la estructura del juego —qué está pasando, por qué, y qué decisión corresponde a cada momento— el caos se convierte en un sistema legible. No fácil, pero legible. Y eso lo cambia todo.
+        </p>
+        <p>
+          La confusión más común del jugador nuevo es pensar que League es un juego sobre <strong>matar al campeón rival</strong>. No lo es. Es un juego sobre <strong>destruir el Nexo enemigo</strong>, que está protegido por torres, inhibidores y cinco jugadores haciendo todo lo posible para que no llegues ahí. Los kills son un medio —no el fin. Puedes ganar una partida con dos kills y perder una con veinte. Lo que importa es quién destruye el Nexo, y eso requiere recursos, mapa y tiempo, no un marcador de bajas.
+        </p>
+        <p>
+          Este módulo no te enseña a jugar bien. Te enseña a entender qué juego estás jugando. La diferencia es enorme: puedes tener buena mecánica durante años y seguir tomando las decisiones equivocadas porque tienes el juego conceptualizado de manera incorrecta. El objetivo aquí es instalar el modelo mental correcto desde el principio, para que todo lo que venga después —control de waves, visión, objetivos, composiciones— caiga en su lugar natural.
+        </p>
+
+        <div class="pull">
+          El error que más jugadores repiten no es mecánico. Es conceptual: creen que están jugando un juego diferente al que realmente están jugando.
+        </div>
+
+        <p>
+          Una nota sobre el tiempo: League of Legends tiene dieciséis años de historia y se actualiza cada dos semanas. Lo que aprendes en este módulo es <strong>estructura fundacional</strong> — la lógica del mapa, los roles, los objetivos, el loop. Estas cosas no cambian entre parches. Cuando llegues a conceptos más específicos (timings exactos de spawn, valores de oro por objetivo, el meta de campeones), esos sí cambian y tendrás que actualizarlos con fuentes activas. Todo lo que contiene este módulo es válido en 2026 y lo seguirá siendo en 2028.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 2: CONTEXTO ========== -->
+<section class="section" id="contexto">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 02</div>
+      <div>
+        <div class="section__kicker">El árbol genealógico</div>
+        <h2 class="section__title">De dónde viene <em>todo esto</em>.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p class="lead">
+          Summoner's Rift no es arbitrario. Su diseño —tres líneas, una jungla, un río, dos objetivos épicos en los lados opuestos del mapa— es el resultado de veinte años de iteración sobre una idea nacida en un mod de Warcraft III.
+        </p>
+        <p>
+          Entender de dónde viene el género te da contexto para entender por qué está diseñado así. Y entender por qué está diseñado así te hace mejor jugador: cuando sabes que el Dragón está del lado bot <em>intencionalmente</em>, que las líneas tienen el largo que tienen <em>por una razón</em>, que el río existe para separar territorios de forma específica, dejas de experimentar el mapa como un escenario aleatorio y empiezas a leerlo como lo que es: un sistema de decisión con geometría deliberada.
+        </p>
+      </div>
+
+      <div class="timeline full">
+        <div class="event">
+          <div class="event__year">2002</div>
+          <div class="event__body">
+            <h5>Aeon of Strife — el punto cero</h5>
+            <p>Un jugador conocido como "Aeon64" crea un mapa personalizado para StarCraft donde cuatro héroes controlados por humanos defienden líneas de ataque contra oleadas de enemigos controlados por la IA. Es el primer prototipo del concepto MOBA (Multiplayer Online Battle Arena): una arena con líneas, oleadas y un objetivo de destrucción final.</p>
+          </div>
+        </div>
+        <div class="event">
+          <div class="event__year">2003</div>
+          <div class="event__body">
+            <h5>DotA — Defense of the Ancients</h5>
+            <p>Eul crea DotA como mapa personalizado para Warcraft III: Reign of Chaos. Es el primer MOBA moderno: 5v5, tres líneas, jungla, héroes con habilidades únicas, dos "Ancients" (bases) que destruir. El concepto explota. Icefrog toma el desarrollo en 2005 y lo refina durante años, estableciendo las convenciones del género que todos los MOBAs posteriores heredarán.</p>
+          </div>
+        </div>
+        <div class="event">
+          <div class="event__year">2006</div>
+          <div class="event__body">
+            <h5>Riot Games — la apuesta</h5>
+            <p>Brandon "Ryze" Beck y Marc "Tryndamere" Merrill fundan Riot Games en Los Ángeles con una sola pregunta: ¿qué pasaría si un MOBA estuviera diseñado desde cero como producto, no como mod? La respuesta implicó tres decisiones clave: modelo free-to-play, rotación de campeones semanal para reducir la barrera de entrada, y un diseño de mapa orientado completamente a la accesibilidad sin sacrificar profundidad.</p>
+          </div>
+        </div>
+        <div class="event">
+          <div class="event__year">2009</div>
+          <div class="event__body">
+            <h5>League of Legends — lanzamiento</h5>
+            <p>El 27 de octubre de 2009, League of Legends sale de beta. El mapa Summoner's Rift tiene tres líneas (top, mid, bot), una jungla, un río diagonal y dos objetivos épicos: Dragón (bot) y Barón Nashor (top). El diseño no es idéntico al actual, pero la estructura es la misma. En su primer año, alcanza dos millones de jugadores activos.</p>
+          </div>
+        </div>
+        <div class="event">
+          <div class="event__year">2011</div>
+          <div class="event__body">
+            <h5>El primer Mundial — Dreamhack, Suecia</h5>
+            <p>El primer Campeonato Mundial de League of Legends se celebra en Dreamhack, Suecia. El equipo Fnatic gana los $50,000 del premio mayor. 1.69 millones de personas lo ven en streaming. El esport competitivo de LoL nace formalmente. Ese año, League ya es el juego de PC más jugado en el mundo.</p>
+          </div>
+        </div>
+        <div class="event">
+          <div class="event__year">2013</div>
+          <div class="event__body">
+            <h5>El pico de los Mundiales</h5>
+            <p>El Campeonato Mundial 2013 alcanza 32 millones de espectadores simultáneos en su final. Para contexto: ese mismo año la final de la NBA tuvo 26 millones. Un videojuego competitivo supera el pico de audiencia de uno de los deportes más populares del mundo occidental. Los esports como industria tienen un antes y un después.</p>
+          </div>
+        </div>
+        <div class="event">
+          <div class="event__year">2014</div>
+          <div class="event__body">
+            <h5>Summoner's Rift — el rediseño visual</h5>
+            <p>Riot rediseña completamente la estética visual del mapa sin alterar su estructura funcional. Esto es importante: confirma que el diseño de 2009 era correcto. No era un prototipo que necesitara revisión conceptual, era una arquitectura que ya funcionaba y que solo necesitaba ponerse al día visualmente. El mapa de 2014 es esencialmente el mismo que juegas hoy.</p>
+          </div>
+        </div>
+        <div class="event">
+          <div class="event__year">2021–2022</div>
+          <div class="event__body">
+            <h5>Arcane — la nueva generación</h5>
+            <p>La serie animada de Netflix ambientada en el universo de League of Legends se convierte en la serie más valorada en la historia de la plataforma. Millones de personas que nunca habían tocado el juego conocen a Vi, Jinx, Jayce y Viktor. El universo de League se expande más allá del juego. El ecosistema Riot —LoL, TFT, Legends of Runeterra, Valorant, Wild Rift— ya es una de las compañías de videojuegos más grandes del mundo.</p>
+          </div>
+        </div>
+        <div class="event">
+          <div class="event__year">2026</div>
+          <div class="event__body">
+            <h5>Season 2026 — Demacia y Pandemonium</h5>
+            <p>La Season 1 de 2026 (temática Demacia) introduce cambios estructurales significativos: los minions ahora spawnean a los 30 segundos (antes 65s), el sistema de role quests premia a cada rol de forma diferenciada, se introduce Aegis of Valor para proteger LP en partidas con autofill, y se reintroduce el duo queue en todos los rangos incluyendo Challenger. En abril de 2026, la Season 2 ("Pandemonium") arranca con un reset completo de MMR para los rangos Master y superior en las principales regiones. League sigue siendo el MOBA más jugado del mundo, con millones de partidas diarias y ligas profesionales activas en Corea (LCK), China (LPL), Europa (LEC) y América (LCS).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>Por qué el mapa está diseñado así</h3>
+        <p>
+          Summoner's Rift tiene <strong>tres líneas</strong> porque tres líneas crean exactamente la tensión correcta: son suficientes para que el juego sea geográficamente complejo, y pocas suficientes para que un equipo de cinco pueda cubrirlas todas con roles especializados. Con dos líneas el juego se volvería demasiado simple. Con cuatro, el caos haría imposible la lectura de mapa para la mayoría de los jugadores.
+        </p>
+        <p>
+          La <strong>jungla</strong> existe como cuarto eje porque sin ella el juego sería una serie de 1v1 o 2v2 paralelos sin comunicación entre líneas. El jungler es el conector: toma recursos propios (campamentos) y activa el mapa entero con su presencia. Su ausencia en una línea es tan poderosa como su presencia.
+        </p>
+        <p>
+          El <strong>río diagonal</strong> no es una decoración. Divide el mapa en dos hemisferios (top-jungle y bot-jungle) creando territorios naturales. El Dragón en el lado bot y el Barón en el lado top obligan a los equipos a decidir constantemente qué parte del mapa priorizar. Si estás ganando bot pero ignoras al Barón, estás dejando el recurso más poderoso del mapa a disposición del rival. El diseño del mapa es, en sí mismo, un sistema de tensiones permanentes.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 3: CONCEPTOS CLAVE ========== -->
+<section class="section" id="conceptos">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 03</div>
+      <div>
+        <div class="section__kicker">El vocabulario del mapa</div>
+        <h2 class="section__title">Los conceptos que <em>estructuran</em> todo.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p class="lead">
+          Cada término del juego que parece jerga técnica es en realidad un concepto con consecuencias estratégicas. No son palabras para memorizar — son herramientas para pensar.
+        </p>
+      </div>
+
+      <div class="concepts full">
+        <div class="concept">
+          <div class="concept__word">Nexo</div>
+          <div class="concept__tag">La condición de victoria</div>
+          <p>La estructura cristalina en el corazón de cada base. Destruir el Nexo enemigo gana la partida al instante, sin importar nada más. Todo lo demás —kills, torres, objetivos— es un camino para llegar ahí. La pregunta que todo jugador debería hacerse en cada decisión es: "¿esto me acerca al Nexo rival?"</p>
+        </div>
+        <div class="concept">
+          <div class="concept__word">Torres</div>
+          <div class="concept__tag">El mapa físico del control</div>
+          <p>Once estructuras defensivas por equipo: tres por línea (outer, inner, inhibitor tower) más dos torres del Nexo. Destruirlas en secuencia abre el camino a la base. Cada torre caída no solo da oro — cambia qué partes del mapa puedes reclamar y cuáles quedan expuestas. Una torre perdida es territorio perdido.</p>
+        </div>
+        <div class="concept">
+          <div class="concept__word">Súbditos</div>
+          <div class="concept__tag">La economía real del juego</div>
+          <p>Oleadas de minions que spawnean cada 30 segundos en cada línea (desde 2026 spawnean a los 30s de partida, antes era a los 65s). Matar un súbdito da oro y experiencia. Una oleada completa equivale aproximadamente a un kill en valor económico. El CS (Creep Score) es la métrica más importante del early game. Un jugador que ignoró las waves perdió partidas antes de la primera pelea.</p>
+        </div>
+        <div class="concept">
+          <div class="concept__word">CS</div>
+          <div class="concept__tag">La métrica fundamental</div>
+          <p>Creep Score: el número total de súbditos y monstruos de jungla que has matado. Es el indicador más honesto de tu rendimiento económico. Un profesional promedia 8–10 CS por minuto en una partida. En un jugador promedio ese número es 4–6. La diferencia de cuatro CS por minuto, en una partida de 35 minutos, equivale a cientos de oro de ventaja acumulada.</p>
+        </div>
+        <div class="concept">
+          <div class="concept__word">Oro</div>
+          <div class="concept__tag">El combustible del poder</div>
+          <p>El recurso que compra objetos (items). Los items aumentan el poder de tu campeón de forma masiva: el primer item completo puede duplicar tu daño en algunos casos. El oro se gana de: matar súbditos (la fuente más confiable), destruir torres (más 6 "platos" de oro por torre hasta el minuto 14), matar campeones rivales y objetivos neutrales. La economía de oro es el juego dentro del juego.</p>
+        </div>
+        <div class="concept">
+          <div class="concept__word">Experiencia</div>
+          <div class="concept__tag">El nivel como poder</div>
+          <p>El recurso que da niveles. Los niveles desbloquean rangos de habilidades y estadísticas base. El nivel 6 es el primer spike crítico: desbloquea el ultimate (habilidad definitiva) de tu campeón. Los picos de nivel 2 y 3 pueden determinar quién gana el early trade de una línea. La disparidad de experiencia entre campeones en la misma línea es tan importante como la disparidad de oro.</p>
+        </div>
+        <div class="concept">
+          <div class="concept__word">Macro</div>
+          <div class="concept__tag">El pensamiento de mapa</div>
+          <p>Las decisiones que afectan el mapa completo: cuándo rotar a ayudar otra línea, cuándo contestar un objetivo, cómo usar el estado de las waves para moverse con seguridad. El macro es lo que separa los jugadores de elo medio de los de alto elo, y es lo que construirás módulo por módulo a lo largo de este camino.</p>
+        </div>
+        <div class="concept">
+          <div class="concept__word">Micro</div>
+          <div class="concept__tag">El combate individual</div>
+          <p>Las decisiones que ocurren dentro de los combates: el posicionamiento, los combos de habilidades, el timing de los summoners, el last-hit preciso. El micro es la base técnica. Sin él, el macro no importa porque no puedes ejecutar las situaciones favorables que el macro crea. Los dos son inseparables, pero se aprenden en orden.</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>Las tres líneas y su lógica</h3>
+        <p>
+          Las tres líneas no son intercambiables. Cada una tiene una economía, un ritmo y una conexión con los objetivos del mapa radicalmente distintos.
+        </p>
+        <p>
+          <strong>Top lane</strong> es la línea aislada. Es la más larga del mapa y la más alejada del primer objetivo crítico (el Dragón, que spawnea del lado bot). Los jugadores de top suelen ser duelistas: tanques que absorben daño o "bruisers" que pueden ganar 1v1 sostenidos. La conexión de top con el mapa viene del Heraldo de la Grieta (Rift Herald), que spawnea en el lado north del río. Un buen jugador de top puede dominar su línea sin interactuar con el resto del equipo durante 15 minutos — y ese aislamiento es tanto su fortaleza como su trampa.
+        </p>
+        <p>
+          <strong>Mid lane</strong> es la línea central. La más corta, la que conecta ambos lados del mapa de forma más directa. El mid laner puede rotar a ayudar tanto a top como a bot sin perder demasiado tiempo en el camino. Eso lo convierte en el rol con más capacidad de influencia global. Los mid laners suelen ser magos (damage sostenido desde distancia segura) o asesinos (burst en targets específicos). En el meta profesional de 2026, el mid laner es frecuentemente el campeón que "carga" la partida en el late game.
+        </p>
+        <p>
+          <strong>Bot lane</strong> es la única línea con dos jugadores: el ADC (marksman, el carry de rango que escala con items) y el Support. El ADC es el campeón más débil en el early game y potencialmente el más poderoso en el late, lo que lo convierte en una apuesta de largo plazo que requiere protección activa. El Support existe para garantizar esa apuesta: da visión, protege al ADC, y en el mid-game transiciona a ser el arquitecto de las jugadas del equipo. Bot lane está en el mismo lado del mapa que el Dragón, lo que conecta directamente su presión con el objetivo más importante de los primeros 20 minutos.
+        </p>
+      </div>
+
+      <div class="tip">
+        <div class="tip__icon">✽</div>
+        <div>
+          <h5>La jungla como cuarto eje</h5>
+          <p>El espacio entre líneas, poblado de campamentos de monstruos neutrales, es el territorio del jungler. No tiene una línea asignada: cultiva campamentos para oro y XP y "gankea" líneas (aparece de improviso para ayudar a matar al rival). Una partida sin jungler activo es una partida donde el equipo rival puede overextenderse sin consecuencias. Un jungler bien jugado hace que el mapa entero pertenezca a su equipo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 4: ROLES ========== -->
+<section class="section" id="roles">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 04</div>
+      <div>
+        <div class="section__kicker">No son personajes, son funciones</div>
+        <h2 class="section__title">Los cinco roles <em>como sistema</em>.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p class="lead">
+          Cada rol tiene una función sistémica dentro del equipo que va mucho más allá de su mecánica de combate. Entender cuál es esa función es lo que te permite tomar decisiones correctas en cada momento de la partida.
+        </p>
+        <p>
+          La pregunta que define a un buen jugador de cualquier rol no es "¿cómo hago daño?" sino "¿qué le da mi rol al equipo en este momento específico?" Las respuestas son distintas en early game, mid game y late game. Y saber cuándo cambia tu función dentro del equipo es exactamente lo que el juego llama "game sense."
+        </p>
+      </div>
+
+      <div class="roles full">
+        <div class="role-card">
+          <div class="role-card__name">Top</div>
+          <div class="role-card__tag">01 · Línea superior</div>
+          <p>Duelista. Absorbe daño o genera presión 1v1 en la línea más aislada del mapa. Su conexión con el equipo viene del Rift Herald y de su capacidad de dividir la atención del rival (split-push).</p>
+          <div class="role-card__function">Función: presión + absorción de daño en teamfights</div>
+        </div>
+        <div class="role-card">
+          <div class="role-card__name">Jungle</div>
+          <div class="role-card__tag">02 · La jungla</div>
+          <p>Conector del mapa. No tiene línea; cultiva campamentos y aparece donde más daño puede hacer. El jungler decide el tempo de la partida: quién recibe recursos y cuándo se contestan objetivos.</p>
+          <div class="role-card__function">Función: control de mapa + setter de objetivos</div>
+        </div>
+        <div class="role-card">
+          <div class="role-card__name">Mid</div>
+          <div class="role-card__tag">03 · Línea central</div>
+          <p>El rol con más influencia global. Puede rotar a cualquier línea rápidamente. Suele ser el carry principal o el campeón con más movilidad del equipo. En teamfights, decide quién muere primero.</p>
+          <div class="role-card__function">Función: influencia global + carry principal</div>
+        </div>
+        <div class="role-card">
+          <div class="role-card__name">ADC</div>
+          <div class="role-card__tag">04 · Bot lane carry</div>
+          <p>El carry de escala. Débil al inicio, devastador con items completos. Depende completamente del support en early game. En late, es el campeón que más daño sostenido genera en teamfights — siempre que no muera.</p>
+          <div class="role-card__function">Función: daño sostenido + DPS de late game</div>
+        </div>
+        <div class="role-card">
+          <div class="role-card__name">Support</div>
+          <div class="role-card__tag">05 · Bot lane apoyo</div>
+          <p>No mata súbditos — construye visión, protege al ADC y hace jugadas. En mid game transiciona de babysitter a arquitecto: pone wards en puntos críticos y ejecuta engage o disengage en peleas de objetivos.</p>
+          <div class="role-card__function">Función: visión + habilitador de equipo</div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>Por qué el rol importa más que el campeón</h3>
+        <p>
+          Hay más de 160 campeones en League of Legends. En 2026, el roster ha seguido expandiéndose. El error común del jugador nuevo es tratar de aprender el juego a través de campeones: "voy a jugar a Yasuo porque se ve cool" o "voy a mainarear a Jinx porque salió en Arcane." El problema es que sin entender el rol al que pertenece un campeón, no tienes el contexto para tomar ninguna decisión correcta con él.
+        </p>
+        <p>
+          Jinx es una ADC. Su función es sobrevivir el early game con el support protegiéndola, farmear para llegar a sus items, y luego en teamfights estar en la posición más trasera posible mientras hace el mayor daño sostenido. Si juegas a Jinx sin entender que su win condition es llegar al late game viva, vas a hacer plays agresivos en early que te costarán la partida.
+        </p>
+        <p>
+          El campeón es la herramienta. El rol es la función. Aprende la función antes que la herramienta.
+        </p>
+
+        <div class="warn">
+          <div class="warn__icon">!</div>
+          <div>
+            <h5>El error de los cinco roles</h5>
+            <p>La recomendación estándar de cualquier coach o guía seria de 2026 es la misma: elige un rol y dos o tres campeones. No diez. No cinco. El ancho de banda mental que liberas al no tener que aprender las mecánicas de un campeón nuevo te permite enfocar tu atención en lo que realmente importa: las decisiones de mapa. Si juegas veinte campeones distintos, nunca sabes qué parte de tu error viene de no conocer el campeón y qué parte de una mala decisión de macro. El caos de variables hace imposible el aprendizaje sistemático.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 5: OBJETIVOS ========== -->
+<section class="section" id="objetivos">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 05</div>
+      <div>
+        <div class="section__kicker">Lo que realmente gana partidas</div>
+        <h2 class="section__title">Los objetivos que <em>importan</em>.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p class="lead">
+          En una partida de League of Legends hay un reloj dentro del mapa. Cada objetivo neutro tiene un horario de spawn, y ese horario es tan predecible como un semáforo. El equipo que aprende a leer esos horarios tiene el mapa a su favor antes de que empiece la pelea.
+        </p>
+        <p>
+          Los objetivos neutrales son, en términos de economía, los recursos más concentrados del juego. No spawnean continuamente como los súbditos — tienen ventanas específicas y quien los consiga primero (o con más frecuencia) acumula una ventaja que se vuelve progresivamente más difícil de remontar. Entender para qué sirve cada uno y cuándo spawnea es una parte no-negociable de saber jugar.
+        </p>
+      </div>
+
+      <div class="objectives full">
+        <div class="obj-card">
+          <div class="obj-card__name">Dragón</div>
+          <div class="obj-card__timing">Spawn: 5:00 · Respawn: 5 min después de muerte · Lado bot</div>
+          <p>El objetivo más importante de los primeros 25 minutos. Cuando tu equipo mata a un Dragón, todos los miembros vivos reciben un buff elemental permanente que se acumula a lo largo de la partida. En 2026, hay seis tipos de Drakes: Infernal (daño), Mountain (resistencias), Cloud (velocidad + CDR de ultimate), Ocean (regeneración), Hextech (haste) y Chemtech (tenacidad + resiliencia). El tipo del segundo Dragón determina el tipo del alma que recibirá el equipo que llegue a cuatro.</p>
+          <p>Al cuarto Drake, el equipo recibe el <strong>Alma del Dragón</strong> — un buff masivo y permanente que puede ser determinante para el late game. Perder tres drakes seguidos sin contestarlos equivale a regalarte al equipo rival una ventaja de poder que se siente durante toda la segunda mitad de la partida.</p>
+          <div class="obj-card__why">Por qué importa ahora: el primer Drake spawnea a los 5:00. La presión de bot lane desde el minuto 3 ya está conectada a este objetivo.</div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-card__name">Heraldo</div>
+          <div class="obj-card__timing">Spawn: 8:00 · Desaparece: 19:45 · Lado top (Baron pit)</div>
+          <p>El Heraldo de la Grieta es el primer objetivo del Baron pit. Cuando muere, deja un ítem —el Ojo del Heraldo— que al activarse invoca a un Heraldo cargando contra una torre, quitándole una fracción masiva de HP en un solo golpe. Se usa para derribar torres exteriores y generar platos de oro antes de que el Baron tome su lugar.</p>
+          <p>En el juego profesional, el primer Heraldo es un recurso disputado constantemente. Los equipos que toman el Heraldo a los 8-9 minutos y lo convierten en una torre derribada (y sus platos de oro) tienen una base económica mucho más sólida para contestar el Baron posterior.</p>
+          <div class="obj-card__why">Por qué importa: es la palanca de control de la línea superior. Un Heraldo bien usado puede generar 500-700 de oro en platos más la gold del torre.</div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-card__name">Barón Nashor</div>
+          <div class="obj-card__timing">Spawn: 20:00 · Respawn: 6 min después de muerte · Lado top</div>
+          <p>El objetivo más poderoso del mapa. Matar a Baron Nashor da a todos los miembros vivos del equipo el buff "Mano del Barón" durante tres minutos, que empodera enormemente a los súbditos cercanos, haciendo que puedan derribar torres que de otra manera serían imposibles de tomar. Una conversión exitosa de Baron — tomar el Baron y luego cerrar el juego empujando con los súbditos empoderados — puede terminar la partida en dos o tres minutos.</p>
+          <p>El Baron también resetea visualmente el pit: el área se llena de voiders que complican la visión. En el juego de alto nivel, el control de visión alrededor del Baron pit en los tres minutos previos a su spawn es una batalla táctica en sí misma.</p>
+          <div class="obj-card__why">Por qué importa: es la llave que abre la base enemiga. La mayoría de las partidas de alto nivel se deciden en si un equipo puede o no convertir un Baron exitoso.</div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-card__name">Torres</div>
+          <div class="obj-card__timing">Presentes desde el inicio · Platos desaparecen a los 14:00</div>
+          <p>Las once torres por equipo tienen dos funciones: defensiva (infligen daño a campeones que se acercan mientras hay sus propias creeps cerca) y económica (cada torre destruida da oro al equipo; los "platos" de torre acumulan oro extra hasta el minuto 14). Las torres externas no respawnean: una vez caídas, el mapa cambia permanentemente.</p>
+          <p>La primera torre exterior caída —la primera que cae en cualquier línea— da un bono de oro adicional "First Blood Tower" al equipo que la destruye. Esto hace que tomar la primera torre sea un objetivo consciente, no un accidente del late game.</p>
+          <div class="obj-card__why">Por qué importa: cada torre caída es territorio ganado. No son solo oro — son control de mapa que no vuelve.</div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-card__name">Inhibidor</div>
+          <div class="obj-card__timing">Ubicado detrás del inhibitor tower · Respawnea en 5 min</div>
+          <p>Destruir el inhibidor de una línea hace que el equipo que lo destruyó genere Supersúbditos en esa línea — versiones enormemente más poderosas de los súbditos normales que presionan solos hacia el Nexo. Un equipo que destruye un inhibidor tiene presión permanente en esa línea mientras no respawnee, lo que obliga al rival a dedicar recursos a defenderse. Con dos o tres inhibidores caídos, la presión es prácticamente imposible de gestionar.</p>
+          <div class="obj-card__why">Por qué importa: los súbditos potenciados hacen el trabajo solo. Con un inhibidor caído, el rival no puede irse del mapa.</div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-card__name">Elder Dragon</div>
+          <div class="obj-card__timing">Aparece después de que un equipo consigue su Alma</div>
+          <p>El Elder Dragon reemplaza al Dragón elemental cuando un equipo obtiene el Alma del Dragón. El buff del Elder amplifica el Alma del equipo que lo mate — si ya tenías el Alma del Océano, el Elder la lleva a otro nivel. Si el equipo rival tiene el Alma y tú el Elder, puedes equiparar parcialmente la desventaja. Es el último poder-escalador del late game, y su aparición suele coincidir con las últimas batallas de la partida.</p>
+          <div class="obj-card__why">Por qué importa: marca el final del arco de poder. Quien tome el Elder en un juego igualado frecuentemente gana el próximo teamfight.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 6: EL LOOP ========== -->
+<section class="section" id="loop">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 06</div>
+      <div>
+        <div class="section__kicker">La estructura temporal del juego</div>
+        <h2 class="section__title">El loop del juego:<br><em>fases y decisiones</em>.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p class="lead">
+          Una partida de League of Legends no es un flujo continuo de eventos. Tiene fases. Cada fase tiene sus propias prioridades, su propia economía y sus propias decisiones correctas. Confundir las prioridades de una fase con otra es uno de los errores más comunes en todos los elos.
+        </p>
+      </div>
+
+      <div class="phases full">
+        <div class="phase">
+          <div class="phase__time">
+            <strong>Early game</strong>
+            0:00 — 14:00
+          </div>
+          <div>
+            <h5>La fase de líneas — establece la base</h5>
+            <p>Los primeros 14 minutos son la "laning phase": cada jugador está en su línea asignada, estableciendo ventajas económicas que determinarán la potencia de su campeón en el mid game. El objetivo no es matar al rival — es acumular CS y experiencia mientras buscas trades favorables y no mueres.</p>
+            <p>Los picos de nivel son decisivos aquí. El nivel 2 (después de la primera oleada más un melee minion adicional) puede ser determinante en líneas que van a 1v1. El nivel 6 — cuando se desbloquea el ultimate — crea la primera ventana de all-in real. El jungler empieza a aparecer con ganks después de su primera clear (aproximadamente minuto 3:00-3:30).</p>
+            <p>Los primeros objetivos: el Dragón spawnea a las 5:00 y el Rift Herald a las 8:00. Los equipos profesionales ya empiezan a "configurar" el primer Dragón antes de que aparezca, posicionando visión y estableciendo prioridad de línea.</p>
+            <div class="phase__clave">Prioridad: CS · experiencia · no morir · primer drag y primer herald</div>
+          </div>
+        </div>
+        <div class="phase">
+          <div class="phase__time">
+            <strong>Mid game</strong>
+            14:00 — 25:00
+          </div>
+          <div>
+            <h5>El mapa se abre — rotaciones y objetivos</h5>
+            <p>Las torres exteriores empiezan a caer y las líneas se disuelven. Los jugadores ya no están en sus puestos fijos: el jungler coordina con el mid para presionar, el support abandona la bot para poner visión en el mapa, el top puede splitpushear o unirse al equipo. El mapa se convierte en un puzzle táctico.</p>
+            <p>Los Drakes se contestan cada 5 minutos. El Rift Herald está siendo usado para derribar torres. Los equipos compiten por la "prioridad": tener suficiente control del mapa para llegar al siguiente objetivo antes que el rival. Una rotación ganadora en mid game puede traducirse directamente en tres o cuatro torres caídas y dos Drakes, cambiando radicalmente el estado de la partida.</p>
+            <p>El Baron aparece a los 20:00. Los primeros intentos de Baron ocurren cuando un equipo consigue un teamfight ganado con números favorables o cuando el rival está demasiado atrás para contestarlo.</p>
+            <div class="phase__clave">Prioridad: control de objetivos · visión · rotaciones · convertir ventajas en torres</div>
+          </div>
+        </div>
+        <div class="phase">
+          <div class="phase__time">
+            <strong>Late game</strong>
+            25:00+
+          </div>
+          <div>
+            <h5>La recta final — teamfights y cierre</h5>
+            <p>Con los items completados, el daño y las resistencias de los campeones están en su pico. Los teamfights son decisivos porque los respawn timers se alargan con el nivel: morir a los 35 minutos puede significar 60-70 segundos fuera del juego, durante los cuales el equipo rival puede tomar Baron, un inhibidor y dos torres.</p>
+            <p>El Baron y el Elder Dragon son los recursos definitivos de esta fase. Un team que convierte un Baron en un push exitoso frecuentemente cierra el juego en 2-3 minutos. El equipo que "sabe cuándo cerrar" — que usa el tempo de estar vivos y con ventaja para atacar directo en lugar de resetear — es el que gana.</p>
+            <p>El error más común del late game: ganar un teamfight, ir a comprar items y perder el tempo. El rival respawnea mientras tú estás de compras, y la ventana de conversión se cierra.</p>
+            <div class="phase__clave">Prioridad: Baron · inhibidores · no tirar el tempo · cerrar cuando se pueda</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>El juego como carrera de recursos, no de kills</h3>
+        <p>
+          El momento en que este concepto hace clic es el que separa al jugador que aprende del que se estanca para siempre. Considera este escenario: el equipo A tiene un jugador de mid que va 12/2 a los 20 minutos, pero su equipo perdió la primera torre bot a los 10 minutos, cedió tres Drakes y tiene el Baron en zona del rival. El equipo B tiene su mid laner en 4/1, pero todas sus torres exteriores están en pie, tiene dos Drakes y acaba de asegurar el Baron. ¿Quién está ganando?
+        </p>
+        <p>
+          El equipo B. Por amplio margen. Las doce kills del jugador del equipo A no se tradujeron en objetivos — son kills turísticos, como se dice en el argot. Paseó su ventaja por el mapa sin convertirla en estructuras, Dragons o Baron. Y ahora el equipo B va a usar su Baron para presionar con súbditos empoderados mientras el team A intenta apagar incendios en tres líneas simultáneas.
+        </p>
+        <p>
+          Esto no significa que los kills no importan. Importan porque generan el tiempo (el rival está muerto y no puede contestar objetivos) y el oro (para comprar más poder). Pero son un medio, no el fin. La pregunta siempre es: "¿esta kill convierte en qué objetivo?" Si la respuesta es "en nada, me quedo esperando al respawn del enemigo", esa kill no valió lo que podría haber valido.
+        </p>
+      </div>
+
+      <div class="equation">
+        <div class="equation__step">
+          <div class="equation__step-label">CS + objetivos</div>
+          <div class="equation__step-sub">recursos primarios</div>
+        </div>
+        <div class="equation__arrow">→</div>
+        <div class="equation__step">
+          <div class="equation__step-label">Items + niveles</div>
+          <div class="equation__step-sub">poder acumulado</div>
+        </div>
+        <div class="equation__arrow">→</div>
+        <div class="equation__step">
+          <div class="equation__step-label">Objetivos épicos</div>
+          <div class="equation__step-sub">ventaja de mapa</div>
+        </div>
+        <div class="equation__arrow">→</div>
+        <div class="equation__step">
+          <div class="equation__step-label">Inhibidores</div>
+          <div class="equation__step-sub">presión permanente</div>
+        </div>
+        <div class="equation__arrow">→</div>
+        <div class="equation__step--final equation__step">
+          <div class="equation__step-label">Nexo</div>
+          <div class="equation__step-sub">victoria</div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>La economía del mapa en todo momento</h3>
+        <p>
+          En cualquier momento de la partida, cada sección del mapa pertenece a uno de tres estados: <strong>tuya</strong> (tus waves avanzan, tienes visión, tus campeones pueden moverse libremente), <strong>del rival</strong> (lo opuesto) o <strong>disputada</strong>. La mayor parte del juego es la negociación constante de cuánto mapa controlas.
+        </p>
+        <p>
+          El marcador de kills no es un mapa confiable de quién está ganando. Hay partidas donde el equipo con más muertes gana porque tomó más objetivos. Lo que sí es un mapa confiable: el estado de las torres, el número de Drakes acumulados, quién tiene el Baron, y cuántas inhibidores siguen en pie. Cuando aprendes a leer esas variables en el minimapa en lugar de la pantalla de puntuación, empiezas a entender realmente qué está pasando en la partida.
+        </p>
+
+        <div class="pull">
+          El scoreboard te dice quién mató más. El mapa te dice quién está ganando. Aprende a leer el mapa.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 7: RANGOS ========== -->
+<section class="section" id="rangos">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 07</div>
+      <div>
+        <div class="section__kicker">Dónde estás y adónde vas</div>
+        <h2 class="section__title">La escalera <em>2026</em>.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p class="lead">
+          El sistema de rangos de League es la métrica más honesta de tu nivel competitivo actual. No perfecta —tiene inercia, tiene varianza— pero estadísticamente confiable a lo largo de muchas partidas. Conocer la distribución real te da contexto para saber dónde estás, qué implica cada salto, y qué tan lejos está el juego profesional desde cualquier punto de partida.
+        </p>
+        <p>
+          En 2026, Riot hizo la recalibración más significativa de la escalera en años. La distribución efectiva de rangos cambió: Iron, que antes recibía a todos los jugadores en sus primeras partidas clasificatorias, fue prácticamente eliminado como destino de inicio. Los nuevos jugadores ahora empiezan en Bronze o Silver. El Gold bajo pasó a ser el rango de la mayoría real de la base. Y los rangos altos —Emerald, Diamond— tienen umbrales más exigentes que temporadas anteriores.
+        </p>
+      </div>
+
+      <div class="ranks full">
+        <div class="rank-row rank-row--you">
+          <div class="rank-row__badge" style="color:var(--ink-dim)">Iron</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:3%; background:var(--ink-faint)"></div></div>
+          <div class="rank-row__pct" style="color:var(--ink-faint)">~3% · entrada formal</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-row__badge" style="color:#a07018">Bronze</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:14%; background:#a07018"></div></div>
+          <div class="rank-row__pct">~14%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-row__badge" style="color:#888">Silver</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:22%; background:#888"></div></div>
+          <div class="rank-row__pct">~22%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-row__badge" style="color:#c4a020">Gold</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:28%; background:#c4a020"></div></div>
+          <div class="rank-row__pct">~28% · mayoría del playerbase</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-row__badge" style="color:#5090c0">Platinum</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:16%; background:#5090c0"></div></div>
+          <div class="rank-row__pct">~16%</div>
+        </div>
+        <div class="rank-row rank-row--elite">
+          <div class="rank-row__badge" style="color:#10a870">Emerald</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:10%; background:#10a870"></div></div>
+          <div class="rank-row__pct">~10% · ya eres minoría</div>
+        </div>
+        <div class="rank-row rank-row--elite">
+          <div class="rank-row__badge" style="color:#4080e0">Diamond</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:4%; background:#4080e0"></div></div>
+          <div class="rank-row__pct">~4% · territorio élite</div>
+        </div>
+        <div class="rank-row rank-row--elite">
+          <div class="rank-row__badge" style="color:#e08020">Master</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:1%; background:#e08020"></div></div>
+          <div class="rank-row__pct">&lt;1%</div>
+        </div>
+        <div class="rank-row rank-row--elite">
+          <div class="rank-row__badge" style="color:#e04020">Grandmaster</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:0.2%; background:#e04020"></div></div>
+          <div class="rank-row__pct">top 500-1000 por región</div>
+        </div>
+        <div class="rank-row rank-row--pro">
+          <div class="rank-row__badge">Challenger</div>
+          <div class="rank-row__bar"><div class="rank-row__fill" style="width:0.1%; background:var(--blue)"></div></div>
+          <div class="rank-row__pct">top 300 por región · calibre pro</div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>Qué separa a cada rango del siguiente</h3>
+        <p>
+          Los rangos no son solo más habilidad — son habilidades <em>diferentes</em>. Lo que te hace subir de Iron a Gold es distinto de lo que te hace subir de Gold a Diamond. Entender qué separa cada salto te permite enfocar tu aprendizaje en lo correcto para donde estás ahora.
+        </p>
+        <p>
+          <strong>Iron-Silver:</strong> La diferencia la hacen las métricas más básicas — CS por minuto, número de muertes por partida y uso de control wards. No es un problema de mecánica avanzada ni de macro strategy. Es un problema de hacer las cosas elementales consistentemente. Un jugador que CS'ea bien, muere menos de cinco veces por partida y compra control wards es automáticamente mejor que el 60% de su elo.
+        </p>
+        <p>
+          <strong>Gold-Platinum:</strong> Aquí empieza el macro. Saber cuándo rotar, cómo leer el estado de las waves para decidir cuándo te puedes mover, cómo preparar visión antes de un objetivo. El jugador de Platinum no es necesariamente más mecánico que el de Gold — toma mejores decisiones de mapa.
+        </p>
+        <p>
+          <strong>Diamond-Master:</strong> La diferencia está en la consistencia. Un jugador de Master hace lo mismo correctamente en el 80% de las partidas, no en el 50%. El conocimiento a ese nivel es similar, pero la ejecución bajo presión y la capacidad de adaptar el juego a variables inesperadas (composición del rival, jungler en posición rara, partida que salió mal desde el draft) es la que separa los rangos.
+        </p>
+        <p>
+          <strong>Grandmaster-Challenger:</strong> El nivel donde el juego profesional comienza. En 2026, Grandmaster representa el top 500-1000 de jugadores por región, y Challenger el top 300 aproximadamente. Estos jugadores son regularmente scouted por equipos profesionales o son ex-pros. El salto de un Diamond a Challenger es, en términos de dedicación, de 500 a 2,000+ horas de juego enfocado.
+        </p>
+
+        <div class="tip">
+          <div class="tip__icon">✽</div>
+          <div>
+            <h5>Sobre el objetivo del juego profesional</h5>
+            <p>El juego profesional en League requiere llegar a Challenger sostenidamente, construir un historial de rendimiento visible, y ser scouted o hacer tryouts para organizaciones. La ruta más directa: Challenger consistente en soloq → invitaciones a challenger series → equipos amateurs → equipos semi-pro → pro. Es un proceso de años, no de temporadas. Este plan de estudios pone los cimientos exactos que lo hacen posible. No hay atajos estructurales que funcionen mejor que aprender bien desde el principio.</p>
+          </div>
+        </div>
+
+        <h3>El MMR y por qué el rango visible no es todo</h3>
+        <p>
+          Debajo del rango visible — la medalla que ves en tu perfil — hay un número oculto llamado MMR (Matchmaking Rating). Es la métrica real con la que el sistema empareja partidas. Puedes estar en Gold II pero con MMR de Platinum, lo que significa que juegas contra Platinos aunque tu rango diga Gold. En 2026, Riot ajustó la relación entre MMR visible y rango para hacer el sistema más transparente: agregaron un "climb indicator" en la pantalla de carga que te avisa cuando tu MMR está por encima de tu rango actual, explicando por qué estás en lobbies aparentemente más difíciles que tu rango sugeriría.
+        </p>
+        <p>
+          Lo importante de entender el MMR: <strong>el sistema siempre trata de ponerte contra jugadores de tu mismo nivel</strong>. Si pierdes muchas partidas seguidas, el MMR baja y las partidas se hacen más fáciles hasta encontrar el equilibrio. Si ganas, el MMR sube y las partidas se hacen más difíciles. El rango visible es una representación retrasada del MMR — a veces va adelante, a veces atrás.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 8: APLICACIÓN PRÁCTICA ========== -->
+<section class="section" id="practica">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 08</div>
+      <div>
+        <div class="section__kicker">Qué haces con esto ahora</div>
+        <h2 class="section__title">Aplicación <em>práctica</em>.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p class="lead">
+          Leer sobre League of Legends no te hace mejor jugador. Lo hace la práctica informada — jugar con un marco de referencia activo. Aquí está lo que deberías observar y hacer en tus próximas partidas con lo que tienes en este módulo.
+        </p>
+      </div>
+
+      <div class="steps full">
+        <div class="step">
+          <div class="step__num"></div>
+          <div class="step__body">
+            <h4>Elige un rol y máximo dos campeones</h4>
+            <p>Antes de jugar tu primera partida clasificatoria, toma una decisión: ¿qué rol vas a mainarear? Si no sabes cuál, empieza por el que más disfrutes visualmente — pero elige uno. Luego elige dos campeones de ese rol que sean reconocidos como "simples mecánicamente" (hay listas actualizadas en u.gg o lolalytics). La complejidad mecánica tiene que ser mínima para que puedas enfocar tu atención en leer el juego, no en ejecutar combos. Recomendación para alguien nuevo: Support (Lux, Soraka, Thresh en orden de complejidad creciente) o Top (Garen, Malphite). Los dos roles tienen campeones con kits claros y objetivos de partida comprensibles desde el día uno.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num"></div>
+          <div class="step__body">
+            <h4>Cierra el scoreboard. Abre el minimapa</h4>
+            <p>El tab score (la pantalla de kills/muertes/asistencias) va a ser tu primer vicio. Ciérrala. En su lugar, desarrolla el hábito de mirar el minimapa cada cinco a diez segundos. ¿Dónde están los enemigos visibles? ¿El jungler apareció en pantalla recientemente? ¿Qué líneas están vacías (lo que significa que ese campeón está rotando)? El minimapa contiene más información estratégica que el scoreboard completo. Y es un hábito que, una vez instalado, nunca se pierde.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num"></div>
+          <div class="step__body">
+            <h4>Memoriza los spawn times de los objetivos</h4>
+            <p>Dragón: 5:00, cada 5 minutos después de su muerte. Rift Herald: 8:00 a 19:45. Baron Nashor: 20:00, cada 6 minutos después de su muerte. Estos tres horarios son el esqueleto temporal del juego. Empieza a anticiparlos: cuando sea el minuto 4:30, algo en tu cabeza debería activarse y preguntar "¿quién tiene control del bot side para el primer Dragón?" No tienes que actuar sobre eso todavía — solo obsérvalo. La consciencia viene antes que la ejecución.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num"></div>
+          <div class="step__body">
+            <h4>Mide tu partida en CS, no en kills</h4>
+            <p>Al terminar cada partida, antes de mirar el scoreboard de kills, mira tu CS. Divide entre los minutos que duró la partida. ¿Cuántos CS por minuto hiciste? Un jugador promedio hace 4-5. Tu objetivo inicial es 6. El objetivo eventual antes de subir de Silver es 7 consistente. El CS es la métrica que más honestamente refleja tu desempeño económico individual, y mejorarla no requiere que el equipo funcione — solo requiere que tú estés en posición de matar los súbditos que están frente a ti.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num"></div>
+          <div class="step__body">
+            <h4>Una sola cosa a mejorar por sesión</h4>
+            <p>El mayor error del jugador nuevo que quiere mejorar rápido es tratar de mejorar todo a la vez. No funciona así. Escoge una cosa por sesión de juego: "hoy voy a enfocarme en mirar el minimapa más seguido." Cuando eso está automatizado, pasas a la siguiente: "ahora voy a CS'ear mejor en early game." El aprendizaje en habilidades motoras y cognitivas complejas requiere foco serial, no paralelo. Este módulo te dio el mapa. Cada sesión elige un punto en ese mapa y trabájalo.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num"></div>
+          <div class="step__body">
+            <h4>Después de cada partida: una pregunta</h4>
+            <p>No analices toda la partida. Hazte una sola pregunta: "¿hubo un momento donde mi equipo tenía ventaja y no lo convirtió en un objetivo?" Si la respuesta es sí, intenta identificar cuál era ese objetivo y por qué no se tomó. No tienes que resolverlo todavía. Solo observar el patrón. Con el tiempo, empezarás a ver esas ventanas de conversión en tiempo real, no en el análisis post-partida.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECCIÓN 9: PARA SEGUIR ========== -->
+<section class="section" id="seguir">
+  <div class="shell">
+    <header class="section__header">
+      <div class="section__num">SECCIÓN 09</div>
+      <div>
+        <div class="section__kicker">Lo que abre este módulo</div>
+        <h2 class="section__title">Las preguntas que <em>siguen</em>.</h2>
+      </div>
+    </header>
+    <div class="section__body">
+      <div class="prose">
+        <p>Este módulo estableció el mapa conceptual. Ahora tienes el vocabulario y la estructura. Lo que falta es profundidad en cada parte de ese mapa. Cada pregunta que sigue apunta a un módulo del camino:</p>
+      </div>
+
+      <div class="questions full">
+        <div class="question">
+          <div class="question__q">?</div>
+          <div class="question__body">
+            <h5>¿Por qué los pros CS'ean incluso cuando van 5/0 y podrían estar presionando al rival?</h5>
+            <p>Porque el CS nunca para de dar oro y experiencia, y un profesional sabe que esa ventaja compuesta es más valiosa que la presión de estar al lado del rival. Esta pregunta abre el <strong>Módulo 2: Micro y la batalla de la línea</strong> — donde aprendes a leer los intercambios de tu línea como una economía de recursos, no como un combate de habilidades.</p>
+          </div>
+        </div>
+        <div class="question">
+          <div class="question__q">?</div>
+          <div class="question__body">
+            <h5>¿Por qué una wave de minions puede ser más poderosa que un kill para tomar una torre?</h5>
+            <p>Porque una wave grande llega a la torre sola, sin que el jugador se exponga. Esta pregunta lleva al <strong>Módulo 3: Wave Management</strong> — la habilidad más subestimada del juego, y el puente entre el micro de la línea y el macro del mapa.</p>
+          </div>
+        </div>
+        <div class="question">
+          <div class="question__q">?</div>
+          <div class="question__body">
+            <h5>¿Cómo sabe el jungler si puede entrar al pit del Barón sin que el rival aparezca?</h5>
+            <p>Por la información de visión. Esta pregunta abre el <strong>Módulo 4: Visión y control del mapa</strong> — donde aprendes a leer el mapa que no ves a través de wards, counter-warding y tracking del jungler rival.</p>
+          </div>
+        </div>
+        <div class="question">
+          <div class="question__q">?</div>
+          <div class="question__body">
+            <h5>¿Por qué algunos equipos toman el Barón y pierden de todas formas?</h5>
+            <p>Porque el Baron solo vale lo que el equipo sabe hacer con él. Esta pregunta lleva al <strong>Módulo 5: Objetivos y tempo</strong> — donde aprendes no solo a tomar objetivos sino a convertirlos en presión real sobre el Nexo rival.</p>
+          </div>
+        </div>
+        <div class="question">
+          <div class="question__q">?</div>
+          <div class="question__body">
+            <h5>¿Cuándo deberías estar en tu línea y cuándo deberías rotar a ayudar a tu equipo?</h5>
+            <p>La respuesta depende del estado de tu wave y de los objetivos próximos. Esta pregunta lleva al <strong>Módulo 6: Macro y toma de decisiones</strong> — donde el mapa completo se vuelve legible como un sistema de elecciones con consecuencias calculables.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose" style="margin-top: 48px;">
+        <h3>Lo que viene inmediatamente después</h3>
+        <p>
+          El <strong>Módulo 2 (Micro: La Batalla de la Línea)</strong> se enfoca en todo lo que pasa dentro de tu línea durante los primeros 15 minutos: cómo last-hitear súbditos consistentemente, cómo leer un intercambio de daño (trade) y saber si es favorable para ti, qué son los picos de nivel y cómo usarlos, cómo leer el matchup de tu línea aunque no conozcas al campeón rival, y cómo usar tus summoner spells como recursos con cooldowns, no como botones de pánico. Todo lo que aprendiste en este módulo sobre la estructura del juego es el contexto en el que el micro cobra sentido.
+        </p>
+        <p>
+          La progresión del camino completo es deliberada: Módulos 1-2 establecen la base (mapa + línea), Módulos 3-5 construyen el puente entre línea y mapa (waves, visión, objetivos), y los Módulos 6-9 desarrollan la lectura estratégica completa (macro, composiciones, sistema de mejora). No hay saltos — cada módulo asume el anterior.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== OUTRO ========== -->
+<section class="outro">
+  <div class="shell">
+    <h2>Ahora sabes<br>qué juego estás <em>jugando</em>.</h2>
+    <p>
+      El caos ya tiene estructura. El mapa ya tiene lógica. Los roles tienen funciones, los objetivos tienen horarios y el marcador de kills dejó de ser la métrica que importa. Con este marco instalado, cada partida que juegues a partir de ahora es una oportunidad de leer el sistema, no de sobrevivir al ruido.
+    </p>
+    <a href="#" class="outro__next">Módulo 02 → Micro: La Batalla de la Línea</a>
+    <div class="outro__sig">Módulo 01 · Videojuegos &amp; Estrategia · Season 2026</div>
+  </div>
+</section>
+
+<script>
+  const bar = document.getElementById('bar');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+    bar.style.width = pct + '%';
+  });
+</script>
+
+</body>
+</html>
