@@ -128,7 +128,7 @@
       margin: 0 40px;
     }
 
-    /* Caminos */
+    /* ── Caminos ── */
     .caminos {
       padding: 28px 40px 40px;
       display: flex;
@@ -143,11 +143,10 @@
       border: 0.5px solid var(--rule);
       transition: border-color 150ms ease-out;
     }
-    .camino:hover { border-color: rgba(30,20,10,0.18); }
 
     .camino-header {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 12px;
       padding: 18px 20px 14px;
     }
@@ -191,7 +190,7 @@
       line-height: 1.55;
     }
 
-    /* Módulos */
+    /* ── Módulos directos ── */
     .modules {
       border-top: 0.5px solid var(--rule);
     }
@@ -231,21 +230,120 @@
       letter-spacing: 0.1em;
       flex-shrink: 0;
     }
-    .status-done  { color: var(--green); }
-    .status-wip   { color: var(--gold); }
-    .status-soon  { color: var(--ink-faint); }
+    .status-done { color: var(--green); }
+    .status-wip  { color: var(--gold); }
+    .status-soon { color: var(--ink-faint); }
 
     .mod-more {
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 9px 20px;
-      opacity: 0.45;
+      opacity: 0.4;
     }
     .mod-more span {
       font-family: var(--mono);
       font-size: 8px;
       color: var(--ink-faint);
+    }
+
+    /* ── Sub-secciones expandibles (Videojuegos) ── */
+    .subsections {
+      border-top: 0.5px solid var(--rule);
+    }
+
+    .subsection {
+      border-bottom: 0.5px solid var(--rule-soft);
+    }
+    .subsection:last-child { border-bottom: none; }
+
+    .subsection-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 20px;
+      cursor: pointer;
+      transition: background 120ms ease-out;
+      user-select: none;
+    }
+    .subsection-toggle:hover { background: var(--bg-soft); }
+
+    .sub-icon {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--ink-faint);
+      width: 14px;
+      flex-shrink: 0;
+      transition: transform 200ms ease-out;
+      display: inline-block;
+    }
+    .subsection.open .sub-icon { transform: rotate(90deg); }
+
+    .sub-name {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      flex: 1;
+    }
+
+    .sub-count {
+      font-family: var(--mono);
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink-faint);
+    }
+
+    .subsection-body {
+      display: none;
+      background: var(--bg-inner);
+      border-top: 0.5px solid var(--rule-soft);
+    }
+    .subsection.open .subsection-body { display: block; }
+
+    .sub-mod-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px 8px 44px;
+      border-bottom: 0.5px solid var(--rule-soft);
+      transition: background 120ms ease-out;
+      cursor: pointer;
+    }
+    .sub-mod-row:last-child { border-bottom: none; }
+    .sub-mod-row:hover { background: var(--bg-soft); }
+
+    /* ── Sección próximamente ── */
+    .coming-soon {
+      padding: 20px;
+      border-top: 0.5px solid var(--rule);
+      display: flex;
+      gap: 16px;
+    }
+
+    .soon-item {
+      flex: 1;
+      padding: 12px 14px;
+      background: rgba(30,20,10,0.03);
+      border: 0.5px dashed rgba(30,20,10,0.12);
+    }
+
+    .soon-label {
+      font-family: var(--mono);
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-faint);
+      margin-bottom: 5px;
+    }
+
+    .soon-name {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-dim);
+      font-style: italic;
     }
 
     /* Footer */
@@ -276,6 +374,7 @@
       .divider { margin: 0 24px; }
       .caminos { padding: 24px 24px 32px; }
       .footer { padding: 16px 24px; }
+      .coming-soon { flex-direction: column; }
     }
   </style>
 </head>
@@ -291,7 +390,7 @@
 </div>
 
 <div class="hero">
-  <p class="eyebrow">Estantería curada · 3 caminos activos</p>
+  <p class="eyebrow">Estantería curada · 4 caminos activos</p>
   <h1 class="title">Para<br><em>entender</em>.</h1>
   <p class="subtitle">Módulos de estudio serio. No guías rápidas.</p>
 </div>
@@ -300,7 +399,7 @@
 
 <div class="caminos">
 
-  <!-- Camino 01: Visual y técnica -->
+  <!-- 01: Visual y técnica -->
   <div class="camino">
     <div class="camino-header">
       <span class="c-num">01 ──</span>
@@ -316,13 +415,13 @@
       </a>
       <div class="mod-row">
         <span class="mod-num">M02</span>
-        <span class="mod-name">Tipografía aplicada</span>
-        <span class="mod-status status-soon">Próximo</span>
+        <span class="mod-name">El color en código · Hex, RGB y percepción</span>
+        <span class="mod-status status-wip">En curso</span>
       </div>
     </div>
   </div>
 
-  <!-- Camino 02: Cultura y espiritualidad -->
+  <!-- 02: Cultura y espiritualidad -->
   <div class="camino">
     <div class="camino-header">
       <span class="c-num">02 ──</span>
@@ -344,43 +443,91 @@
     </div>
   </div>
 
-  <!-- Camino 03: Videojuegos y estrategia -->
+  <!-- 03: Videojuegos y estrategia — expandibles -->
   <div class="camino">
     <div class="camino-header">
       <span class="c-num">03 ──</span>
       <span class="c-name">Videojuegos y estrategia</span>
       <span class="c-tag">Sistema</span>
     </div>
-    <p class="c-desc">Entender los juegos como sistemas de decisión. Camino hacia el juego competitivo.</p>
-    <div class="modules">
-      <a href="videojuegos-estrategia/lol-el-juego-como-sistema/" class="mod-row">
-        <span class="mod-num">M01</span>
-        <span class="mod-name">League of Legends · El juego como sistema</span>
-        <span class="mod-status status-done">✓ Completo</span>
-      </a>
-      <div class="mod-row">
-        <span class="mod-num">M02</span>
-        <span class="mod-name">Micro: la batalla de la línea</span>
-        <span class="mod-status status-wip">En curso</span>
+    <p class="c-desc">Los juegos como sistemas de decisión. Camino hacia el juego competitivo.</p>
+
+    <div class="subsections">
+
+      <!-- League of Legends -->
+      <div class="subsection open" id="sub-lol">
+        <div class="subsection-toggle" onclick="toggleSub('sub-lol')">
+          <span class="sub-icon">▶</span>
+          <span class="sub-name">League of Legends</span>
+          <span class="sub-count">1 de 9 completos</span>
+        </div>
+        <div class="subsection-body">
+          <a href="videojuegos-estrategia/lol-el-juego-como-sistema/" class="sub-mod-row">
+            <span class="mod-num">M01</span>
+            <span class="mod-name">El juego como sistema</span>
+            <span class="mod-status status-done">✓ Completo</span>
+          </a>
+          <div class="sub-mod-row">
+            <span class="mod-num">M02</span>
+            <span class="mod-name">Micro: la batalla de la línea</span>
+            <span class="mod-status status-wip">En curso</span>
+          </div>
+          <div class="sub-mod-row">
+            <span class="mod-num">M03</span>
+            <span class="mod-name">Wave management</span>
+            <span class="mod-status status-soon">Próximo</span>
+          </div>
+          <div class="mod-more" style="padding-left:44px">
+            <span class="mod-num">···</span>
+            <span>6 módulos más en camino</span>
+          </div>
+        </div>
       </div>
-      <div class="mod-row">
-        <span class="mod-num">M03</span>
-        <span class="mod-name">Wave management</span>
-        <span class="mod-status status-soon">Próximo</span>
+
+      <!-- Clash Royale -->
+      <div class="subsection" id="sub-cr">
+        <div class="subsection-toggle" onclick="toggleSub('sub-cr')">
+          <span class="sub-icon">▶</span>
+          <span class="sub-name">Clash Royale</span>
+          <span class="sub-count">Próximamente</span>
+        </div>
+        <div class="subsection-body">
+          <div class="sub-mod-row">
+            <span class="mod-num">M01</span>
+            <span class="mod-name">El elixir como economía · Fundamentos</span>
+            <span class="mod-status status-soon">Próximo</span>
+          </div>
+          <div class="sub-mod-row">
+            <span class="mod-num">M02</span>
+            <span class="mod-name">Ciclo de mazo y contador de cartas</span>
+            <span class="mod-status status-soon">Próximo</span>
+          </div>
+          <div class="mod-more" style="padding-left:44px">
+            <span class="mod-num">···</span>
+            <span>Temario completo en definición</span>
+          </div>
+        </div>
       </div>
-      <div class="mod-row">
-        <span class="mod-num">M04</span>
-        <span class="mod-name">Visión y control de mapa</span>
-        <span class="mod-status status-soon">Próximo</span>
+
+    </div>
+  </div>
+
+  <!-- 04: Musical -->
+  <div class="camino">
+    <div class="camino-header">
+      <span class="c-num">04 ──</span>
+      <span class="c-name">Musical</span>
+      <span class="c-tag">Composición</span>
+    </div>
+    <p class="c-desc">Armonía aplicada al bajo, composición lírica y el reggae como lenguaje.</p>
+    <div class="coming-soon">
+      <div class="soon-item">
+        <div class="soon-label">Próximo · M01</div>
+        <div class="soon-name">Armonía aplicada al bajo eléctrico</div>
       </div>
-      <div class="mod-row">
-        <span class="mod-num">M05</span>
-        <span class="mod-name">Objetivos y tempo</span>
-        <span class="mod-status status-soon">Próximo</span>
-      </div>
-      <div class="mod-more">
-        <span class="mod-num">···</span>
-        <span>4 módulos más en camino</span>
+      <div class="soon-item">
+        <div class="soon-label">Próximo · M02</div>
+        <div class="soon-name">Composición lírica · Estructura y herramienta</div>
       </div>
     </div>
   </div>
@@ -390,6 +537,13 @@
 <footer class="footer">
   <span class="footer-text">Jorge Malgesto · 2026</span>
 </footer>
+
+<script>
+  function toggleSub(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+</script>
 
 </body>
 </html>

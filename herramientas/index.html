@@ -149,6 +149,11 @@
     }
     .card:hover .card-arrow { color: var(--gold); }
 
+    /* Card marcada como beta */
+    .card.beta {
+      border-style: dashed;
+    }
+
     .card-num {
       font-family: var(--mono);
       font-size: 9px;
@@ -169,6 +174,11 @@
       display: inline-block;
       margin-bottom: 8px;
       align-self: flex-start;
+    }
+
+    .card-tag.beta-tag {
+      background: rgba(160,112,24,0.10);
+      color: var(--gold);
     }
 
     .card-title {
@@ -240,7 +250,7 @@
 </div>
 
 <div class="hero">
-  <p class="eyebrow">Suite personal · 4 herramientas</p>
+  <p class="eyebrow">Suite personal · 5 herramientas</p>
   <h1 class="title">Para tocar<br><em>mejor</em>.</h1>
   <p class="subtitle">Construidas para el trabajo real: ensayo, show, armonía.</p>
 </div>
@@ -255,6 +265,7 @@
     <p class="card-desc">Detección de pitch con algoritmo YIN. Funciona desde el micrófono del dispositivo. Standard y Drop D.</p>
     <div class="card-arrow">Abrir →</div>
   </a>
+
   <a href="hartke.html" class="card">
     <div class="card-num">02 ──</div>
     <span class="card-tag">EQ · Amplificador</span>
@@ -262,6 +273,7 @@
     <p class="card-desc">Configuraciones de EQ recomendadas por proyecto y género. Presets para Davis Don, Leocadio y Juana.</p>
     <div class="card-arrow">Abrir →</div>
   </a>
+
   <a href="setlist.html" class="card">
     <div class="card-num">03 ──</div>
     <span class="card-tag">Show · Escenario</span>
@@ -269,11 +281,20 @@
     <p class="card-desc">Navegador de canciones para el show. Modo edición y modo escenario con vista limpia.</p>
     <div class="card-arrow">Abrir →</div>
   </a>
+
   <a href="leocadio-repertorio.html" class="card">
     <div class="card-num">04 ──</div>
     <span class="card-tag">Repertorio</span>
     <div class="card-title">Leocadio</div>
     <p class="card-desc">Gestión de canciones y armador de sets por energía y tonalidad. Manual o asistido.</p>
+    <div class="card-arrow">Abrir →</div>
+  </a>
+
+  <a href="bajo-armonia.html" class="card beta">
+    <div class="card-num">05 ──</div>
+    <span class="card-tag beta-tag">Beta</span>
+    <div class="card-title">Bajo · Armonía</div>
+    <p class="card-desc">Detecta la tónica de una canción por notas y explora el diapasón iluminado por acorde y tonalidad.</p>
     <div class="card-arrow">Abrir →</div>
   </a>
 </div>
